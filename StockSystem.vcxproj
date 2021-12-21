@@ -143,10 +143,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="fileIO.cpp" />
+    <ClCompile Include="stock.cpp" />
     <ClCompile Include="stocksys.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="fileIO.h" />
+    <ClInclude Include="stock.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

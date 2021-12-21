@@ -2,7 +2,7 @@
 #include "libxl.h"
 
 #include "fileIO.h"
-
+#include "stock.h"
 
 using namespace std;
 using namespace libxl;
