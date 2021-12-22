@@ -24,12 +24,18 @@
     <ClCompile Include="stock.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="ds.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="fileIO.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="stock.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ds.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
