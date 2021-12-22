@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <Windows.h>
+#include <string>
 
 #include "libxl.h"
 #include "stock.h"
