@@ -208,10 +208,10 @@ void BSTree::BSsearch(string key)
 
 void LinkList::search_price_by_date(string date)
 {
-	bool find = false;
 	LNode* p = head->next;
 	while (p)
 	{
+		bool find = false;
 		priceList t = p->key_stock.getLog_ptr()->next;
 		cout << p->key_stock.stockCode << ' ' << p->key_stock.stockName << ' ';
 		while (t)
@@ -226,6 +226,74 @@ void LinkList::search_price_by_date(string date)
 		}
 		if (!find)
 			cout << "没有当日信息!" << endl;
+		p = p->next;
+	}
+}
+
+void LinkList::creatPricelist(string date)
+{
+	LNode* p = head->next;
+	price_sort = new priceNode;
+	price_sort->next = NULL;
+	priceList t = price_sort;
+	while (p)
+	{
+		priceNode* work_ptr = p->key_stock.tradeLog->next;
+		while (work_ptr)
+		{
+			if (work_ptr->tradeDate == date)break;
+			work_ptr = work_ptr->next;
+		}
+		if (work_ptr)
+		{
+			priceNode* temp = new priceNode;
+			temp->code = p->key_stock.getCode();
+			temp->name = p->key_stock.getName();
+			temp->tradeDate = work_ptr->tradeDate;
+			temp->openPrice = work_ptr->openPrice;
+			temp->closePrice = work_ptr->closePrice;
+			temp->quotePerChange = work_ptr->quotePerChange;
+			temp->next = NULL;
+			t->next = temp;
+			t = t->next;
+		}
+		else cout << p->key_stock.getCode() << ' ' << p->key_stock.getName() << ' ' << "无当日数据！" << endl;
+		p = p->next;
+	}
+}
+void LinkList::insertSort(string sortmode)
+{
+	if (price_sort->next == NULL)return;
+	priceList unnext;
+	priceList unsorted = price_sort->next->next;
+	price_sort->next->next = NULL;
+	while (unsorted)
+	{
+		unnext = unsorted->next;
+		priceList sorted = price_sort;
+		if (sortmode == "open")
+		{
+			while (sorted->next && sorted->next->openPrice > unsorted->openPrice)
+				sorted = sorted->next;
+		}
+		else if (sortmode == "close")
+		{
+			while (sorted->next && sorted->next->closePrice > unsorted->closePrice)
+				sorted = sorted->next;
+		}	
+		else if (sortmode == "rate")
+		{
+			while (sorted->next && sorted->next->quotePerChange > unsorted->quotePerChange)
+				sorted = sorted->next;
+		}
+		unsorted->next = sorted->next;
+		sorted->next = unsorted;
+		unsorted = unnext;
+	}
+	priceList p = price_sort->next;
+	while (p)
+	{
+		cout << p->code << ' ' << p->name << ' ' << p->openPrice << ' ' << p->closePrice << ' ' << p->quotePerChange << endl;
 		p = p->next;
 	}
 }

@@ -69,5 +69,12 @@ int main()
 	{
 		data_LinkList.search_price_by_date(dest_key);
 	}*/
+	/*cout << "单链表日期排股价：输入日期，0结束输入" << endl;
+	while (cin >> dest_key && dest_key != "0")
+	{
+		data_LinkList.creatPricelist(dest_key);
+		data_LinkList.insertSort("rate");
+	}*/
+	
 	return 0;
 }

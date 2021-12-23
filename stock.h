@@ -6,6 +6,8 @@ using namespace std;
 
 typedef struct priceNode
 {
+	string code;
+	string name;
 	//开盘价 收盘价 涨跌幅
 	string tradeDate;
 	double openPrice;
@@ -23,7 +25,7 @@ public:
 	void addLogData(string, double, double, double);
 	priceList getLog_ptr() { return tradeLog; }
 	string getCode() { return stockCode; }
-	/*string getName() { return stockname; }*/
+	string getName() { return stockName; }
 private:
 	string stockCode;		//股票代码
 	string stockName;		//股票简称

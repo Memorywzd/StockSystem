@@ -24,9 +24,13 @@ public:
 
 	void search_price_by_date(string);
 
+	void creatPricelist(string);
+	void insertSort(string);
+
 	LNode* get_head_ptr() { return head; }
 private:
 	LNode* head;
+	priceNode* price_sort;
 	int length;
 	int kmp_next[40];
 };
