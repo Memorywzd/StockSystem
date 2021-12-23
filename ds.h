@@ -17,7 +17,7 @@ class LinkList
 public:
 	LinkList();
 	~LinkList();
-	void add_data(stock&);
+	void add_data(stock);
 	void KMP_search(string);
 	void get_next_val(string);
 	LNode* get_head_ptr() { return head; }
@@ -42,7 +42,24 @@ public:
 	bool hash_search(string);
 private:
 	hashNode* hashTable[97];
-	double factor = 200.0 / 97;
+	double factor = 200.0 / 97;//wrong
 	double suc_ASL = 1 + factor / 2;
 	double fail_ASL = factor + exp(-factor);
+};
+
+class BSNode
+{
+public:
+	string key_code;
+	stock info_stock;
+	BSNode* lchild, * rchild;
+};
+class BSTree
+{
+public:
+	BSTree();
+	void insertBST(stock);
+	void BSsearch(string);
+private:
+	BSNode* bsTree;
 };

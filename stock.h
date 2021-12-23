@@ -7,19 +7,23 @@ using namespace std;
 typedef struct priceNode
 {
 	//开盘价 收盘价 涨跌幅
-	string tradeDate = "0";
-	double openPrice = -1;
-	double closePrice = -1;
-	double quotePerChange = 0;
+	string tradeDate;
+	double openPrice;
+	double closePrice;
+	double quotePerChange;
+
+	priceNode* next;
 }priceNode, * priceList;
 
 class stock
 {
 public:
 	void initStock(string);
-	void initTradeLog(string);
-	/*string getCode() { return stockCode; }
-	string getName() { return stockname; }*/
+	void initTradeLog();
+	void addLogData(string, double, double, double);
+	priceList getLog_ptr() { return tradeLog; }
+	string getCode() { return stockCode; }
+	/*string getName() { return stockname; }*/
 private:
 	string stockCode;		//股票代码
 	string stockName;		//股票简称
@@ -41,6 +45,7 @@ private:
 
 	priceList tradeLog;
 
+	friend class fileIO;
 	friend class LinkList;
 	friend class hashSearch;
 };

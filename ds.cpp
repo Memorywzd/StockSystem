@@ -17,7 +17,7 @@ LinkList::~LinkList()
 	}
 	head = NULL;
 }
-void LinkList::add_data(stock& s)
+void LinkList::add_data(stock s)
 {
 	LNode* tail = this->head;
 	while (tail->next)
@@ -131,25 +131,47 @@ void LinkList::KMP_search(string key)
 {
 	LNode* p = head->next;
 	this->get_next_val(key);
-	int ketlen = key.length();
-	int websitelen = p->key_stock.website.length();
+	int keylen = key.length();
+	bool find = false;
 	while (p)
 	{
 		int i = 0, j = 0;
-		while (i < websitelen && j < ketlen)
+		int websitelen = p->key_stock.website.length();
+		while (i < websitelen && j < keylen)
 		{
-			if (j == -1 || p->key_stock.website[i]==key[j])
+			if (j == -1 || p->key_stock.website[i] == key[j])
 			{
 				i++;
 				j++;
 			}
 			else j = kmp_next[j];
 		}
-		if (j > ketlen)
+		if (j >= keylen)
 		{
 			cout << p->key_stock.stockName << ' ' << p->key_stock.stockCode << endl;
-			break;
+			find = true;
+			//break;
 		}
 		p = p->next;
 	}
+	if (!find)cout << "fail!" << endl;
 }
+
+BSTree::BSTree()
+{
+	bsTree = new BSNode;
+	bsTree->lchild = NULL;
+	bsTree->rchild = NULL;
+}
+
+void BSTree::insertBST(stock s)
+{
+	if (!bsTree)
+	{
+		BSNode* t = new BSNode;
+		t->key_code = s.getCode();
+		t->info_stock = s;
+		t->lchild = t->rchild = NULL;
+	}
+}
+

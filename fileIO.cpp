@@ -3,8 +3,9 @@
 fileIO::fileIO(string path)
 {
 	const char* pathc = path.data();
-	const char* txtpath = "./data/股票交易日志";
-	if (path[13] == *txtpath)
+	string dest = "./data/股票交易日志";
+	string sour = path.substr(0, 19);
+	if (sour == dest)
 	{
 		isTxt = true;
 		txtfile.open(path);
@@ -85,5 +86,35 @@ void fileIO::readline(int row)
 			strcont += "EMPTY ";
 		}
 		else strcont += "UNHANDLED ";
+	}
+}
+
+void fileIO::readtxt(stock& tempStock)
+{
+	char buffer[100];
+	bool firstline = true;
+	string temp, trash;
+	string tradeDate;
+	double openPrice, closePrice;
+	string qpc;
+	double quotePerChange;
+	while (txtfile)
+	{
+		txtfile.getline(buffer, 100);
+		if (firstline)
+		{
+			firstline = false;
+			continue;
+		}
+		temp = buffer;
+		if (temp == "")continue;
+		istringstream ss(temp);
+		ss >> tradeDate >> openPrice >> closePrice;
+		ss >> trash >> trash >> trash;
+		ss >> trash >> trash >> trash;
+		ss >> qpc;
+		qpc.pop_back();
+		quotePerChange = atof(qpc.c_str());
+		tempStock.addLogData(tradeDate, openPrice, closePrice, quotePerChange);
 	}
 }

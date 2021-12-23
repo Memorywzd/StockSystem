@@ -8,44 +8,61 @@
 using namespace std;
 using namespace libxl;
 
-void initsys(LinkList& intro_LinkList, fileIO& intro_file)
+void initsys(LinkList& data_LinkList, fileIO& intro_file)
 {
 	for (int i = 1; i <= 200; i++)
 	{
 		stock tempStock;
+
 		intro_file.readline(i);
-		//cout << intro_file.get_cont_str() << endl;
-		tempStock.initStock(intro_file.get_cont_str());
-		intro_LinkList.add_data(tempStock);
+		tempStock.initStock(intro_file.get_cont_str());//初始化基本数据
+
+		string tradeLog_path;
+		tradeLog_path += "./data/股票交易日志/" + tempStock.getCode() + ".txt";
+		fileIO log_file(tradeLog_path);
+		tempStock.initTradeLog();
+		log_file.readtxt(tempStock);//初始化交易日志
+
+		data_LinkList.add_data(tempStock);//放入数据链表
 	}
-	/*LNode* temp = intro_LinkList.get_head_ptr()->next;
-	int maxlen = 0;
+	/*LNode* temp = data_LinkList.get_head_ptr()->next;
 	while (temp)
 	{
-		if(temp->key_stock.getweb().length()>maxlen)
-			maxlen= temp->key_stock.getweb().length();
+		cout << temp->key_stock.getCode() << endl << "交易记录：" << endl;
+		priceList temp1 = temp->key_stock.getLog_ptr()->next;
+		while (temp1)
+		{
+			cout << temp1->tradeDate << ' ' << temp1->openPrice << ' ';
+			cout << temp1->closePrice << ' ' << temp1->quotePerChange << endl;
+			temp1 = temp1->next;
+		}
 		temp = temp->next;
-	}
-	cout << maxlen << endl;*/
+	}*/
 }
 
 int main()
 {
 	
-	LinkList intro_LinkList;
+	LinkList data_LinkList;
 	fileIO intro_file("./data/A股公司简介.xlsx");
-	initsys(intro_LinkList, intro_file);
-	hashSearch search_obj(intro_LinkList);
+	initsys(data_LinkList, intro_file);
+	hashSearch search_obj(data_LinkList);
+	BSTree bsTree();
 	string dest_key;
-	/*cout << "输入股票代码，0结束输入" << endl;
+	/*cout << "哈希查找：输入股票代码，0结束输入" << endl;
 	while (cin >> dest_key && dest_key != "0")
 	{
 		if (!search_obj.hash_search(dest_key))cout << "fail!" << endl;
 	}*/
-	cout << "输入股票网址，0结束输入" << endl;
+	/*cout << "KMP匹配：输入股票网址，0结束输入" << endl;
 	while (cin >> dest_key && dest_key != "0")
 	{
-		intro_LinkList.KMP_search(dest_key);
+		data_LinkList.KMP_search(dest_key);
+	}*/
+	cout << "二叉排序树查找：输入股票代码，0结束输入" << endl;
+	while (cin >> dest_key && dest_key != "0")
+	{
+
 	}
 	
 	return 0;

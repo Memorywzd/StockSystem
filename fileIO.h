@@ -4,6 +4,7 @@
 #include <fstream>
 #include <Windows.h>
 #include <string>
+#include <sstream>
 
 #include "libxl.h"
 #include "stock.h"
@@ -14,12 +15,12 @@ using namespace libxl;
 class fileIO
 {
 public:
-	fileIO(string);
-	fileIO(string, bool, int, const char*);
+	fileIO(string);							// read only
+	fileIO(string, bool, int, const char*);	// r/w
 	~fileIO();
 	void readline(int);
+	void readtxt(stock&);
 	string get_cont_str() { return strcont; }
-	double get_cont_num() { return numcont; }
 
 private:
 	string path_to_save;
@@ -30,6 +31,6 @@ private:
 	Sheet* sheetread;
 
 	string strcont;
-	double numcont;
+	//double numcont;
 };
 
