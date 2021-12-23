@@ -41,7 +41,7 @@ private:
 
 	priceList tradeLog;
 
-	friend class LNode;
+	friend class LinkList;
 	friend class hashSearch;
 };
 

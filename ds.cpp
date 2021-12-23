@@ -108,3 +108,48 @@ bool hashSearch::hash_search(string key)
 	}
 
 }
+
+void LinkList::get_next_val(string key)
+{
+	int i = 0, j = -1;
+	kmp_next[0] = -1;
+	int keylen = key.length();
+	while (i < keylen - 1)
+	{
+		if (j == -1 || key[i] == key[j])
+		{
+			i++;
+			j++;
+			if (key[i] != key[j])
+				kmp_next[i] = j;
+			else kmp_next[i] = kmp_next[j];
+		}
+		else j = kmp_next[j];
+	}
+}
+void LinkList::KMP_search(string key)
+{
+	LNode* p = head->next;
+	this->get_next_val(key);
+	int ketlen = key.length();
+	int websitelen = p->key_stock.website.length();
+	while (p)
+	{
+		int i = 0, j = 0;
+		while (i < websitelen && j < ketlen)
+		{
+			if (j == -1 || p->key_stock.website[i]==key[j])
+			{
+				i++;
+				j++;
+			}
+			else j = kmp_next[j];
+		}
+		if (j > ketlen)
+		{
+			cout << p->key_stock.stockName << ' ' << p->key_stock.stockCode << endl;
+			break;
+		}
+		p = p->next;
+	}
+}

@@ -18,12 +18,15 @@ void initsys(LinkList& intro_LinkList, fileIO& intro_file)
 		tempStock.initStock(intro_file.get_cont_str());
 		intro_LinkList.add_data(tempStock);
 	}
-	//LNode* temp = intro_LinkList.get_head_ptr()->next;
-	/*while (temp)
+	/*LNode* temp = intro_LinkList.get_head_ptr()->next;
+	int maxlen = 0;
+	while (temp)
 	{
-		cout << temp->key_stock.getCode()<<' ' << temp->key_stock.getName() << endl;
+		if(temp->key_stock.getweb().length()>maxlen)
+			maxlen= temp->key_stock.getweb().length();
 		temp = temp->next;
-	}*/
+	}
+	cout << maxlen << endl;*/
 }
 
 int main()
@@ -34,9 +37,16 @@ int main()
 	initsys(intro_LinkList, intro_file);
 	hashSearch search_obj(intro_LinkList);
 	string dest_key;
+	/*cout << "输入股票代码，0结束输入" << endl;
 	while (cin >> dest_key && dest_key != "0")
 	{
 		if (!search_obj.hash_search(dest_key))cout << "fail!" << endl;
+	}*/
+	cout << "输入股票网址，0结束输入" << endl;
+	while (cin >> dest_key && dest_key != "0")
+	{
+		intro_LinkList.KMP_search(dest_key);
 	}
+	
 	return 0;
 }

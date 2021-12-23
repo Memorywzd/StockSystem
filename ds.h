@@ -18,10 +18,13 @@ public:
 	LinkList();
 	~LinkList();
 	void add_data(stock&);
+	void KMP_search(string);
+	void get_next_val(string);
 	LNode* get_head_ptr() { return head; }
 private:
 	LNode* head;
 	int length;
+	int kmp_next[40];
 };
 
 class hashNode
@@ -41,5 +44,5 @@ private:
 	hashNode* hashTable[97];
 	double factor = 200.0 / 97;
 	double suc_ASL = 1 + factor / 2;
-	double fail_ASL = factor + exp(0 - factor);
+	double fail_ASL = factor + exp(-factor);
 };
