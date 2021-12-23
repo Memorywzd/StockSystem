@@ -47,23 +47,27 @@ int main()
 	fileIO intro_file("./data/A股公司简介.xlsx");
 	initsys(data_LinkList, intro_file);
 	hashSearch search_obj(data_LinkList);
-	BSTree bsTree();
+	BSTree bsTree(data_LinkList);
 	string dest_key;
 	/*cout << "哈希查找：输入股票代码，0结束输入" << endl;
 	while (cin >> dest_key && dest_key != "0")
 	{
-		if (!search_obj.hash_search(dest_key))cout << "fail!" << endl;
+		search_obj.hash_search(dest_key);
 	}*/
 	/*cout << "KMP匹配：输入股票网址，0结束输入" << endl;
 	while (cin >> dest_key && dest_key != "0")
 	{
 		data_LinkList.KMP_search(dest_key);
 	}*/
-	cout << "二叉排序树查找：输入股票代码，0结束输入" << endl;
+	/*cout << "二叉排序树查找：输入股票代码，0结束输入" << endl;
 	while (cin >> dest_key && dest_key != "0")
 	{
-
-	}
-	
+		bsTree.BSsearch(dest_key);
+	}*/
+	/*cout << "单链表日期查股价：输入日期，0结束输入" << endl;
+	while (cin >> dest_key && dest_key != "0")
+	{
+		data_LinkList.search_price_by_date(dest_key);
+	}*/
 	return 0;
 }

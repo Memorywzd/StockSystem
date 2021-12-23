@@ -18,8 +18,12 @@ public:
 	LinkList();
 	~LinkList();
 	void add_data(stock);
+
 	void KMP_search(string);
 	void get_next_val(string);
+
+	void search_price_by_date(string);
+
 	LNode* get_head_ptr() { return head; }
 private:
 	LNode* head;
@@ -39,7 +43,7 @@ class hashSearch
 public:
 	hashSearch(LinkList&);
 	int get_hash(string);
-	bool hash_search(string);
+	void hash_search(string);
 private:
 	hashNode* hashTable[97];
 	double factor = 200.0 / 97;//wrong
@@ -57,9 +61,9 @@ public:
 class BSTree
 {
 public:
-	BSTree();
-	void insertBST(stock);
+	BSTree(LinkList&);
 	void BSsearch(string);
 private:
 	BSNode* bsTree;
+	//ASL
 };
