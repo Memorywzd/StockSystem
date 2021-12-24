@@ -297,3 +297,176 @@ void LinkList::insertSort(string sortmode)
 		p = p->next;
 	}
 }
+
+sixtyList::sixtyList()
+{
+	QStable = new sixtyNode[60];
+	length = 0;
+	EShead = new sixtyNode;
+	EShead->next = NULL;
+}
+sixtyList::~sixtyList()
+{
+	delete[]QStable;
+	length = 0;
+	sixtyNode* p = EShead;
+	while (p)
+	{
+		sixtyNode* t;
+		t = p;
+		p = p->next;
+		delete t;
+	}
+}
+void sixtyList::creatQSList(LinkList& data, string inputs, string catg)
+{
+	LNode* p = data.get_head_ptr()->next;
+	istringstream ss(inputs);
+	string temp, code;
+	int score;
+	ss >> temp >> temp >> code >> score;
+	while (p)
+	{
+		if (p->key_stock.getCode() == code && p->key_stock.getCatg() == catg)
+		{
+			priceList pt = p->key_stock.getLog_ptr()->next;
+			double max_rate = -10000.0;
+			string max_date;
+			while (pt)
+			{
+				if (pt->quotePerChange > max_rate)
+				{
+					max_rate = pt->quotePerChange;
+					max_date = pt->tradeDate;
+				}
+				pt = pt->next;
+			}
+			QStable[length].name = p->key_stock.getName();
+			QStable[length].code = code;
+			QStable[length].score = score;
+			QStable[length].date = max_date;
+			QStable[length].rate = max_rate;
+			QStable[length].next = NULL;
+			length++;
+			break;
+		}
+		p = p->next;
+	}
+}
+void sixtyList::quickSort()
+{
+	QSort(0, length - 1);
+}
+void sixtyList::QSort(int low, int high)
+{
+	if (low < high)
+	{
+		int pivotloc = partition(low, high);
+		QSort(low, pivotloc - 1);
+		QSort(pivotloc + 1, high);
+	}
+}
+int sixtyList::partition(int low, int high)
+{
+	sixtyNode t = QStable[low];
+	double pivotkey = QStable[low].rate;
+	while (low < high)
+	{
+		while (low < high && QStable[high].rate <= pivotkey)
+			high--;
+		QStable[low] = QStable[high];
+		while (low < high && QStable[low].rate >= pivotkey)
+			low++;
+		QStable[high] = QStable[low];
+	}
+	QStable[low] = t;
+	return low;
+}
+void sixtyList::showQS()
+{
+	if (length == 0)
+		cout << "无该行业数据！" << endl;
+	for (int i = 0; i < length; i++)
+	{
+		cout << i << ' ' << QStable[i].code << ' ' << QStable[i].name << ' ';
+		cout << QStable[i].rate << ' ' << QStable[i].date << endl;
+	}
+}
+
+void sixtyList::creatESList(LinkList& data, string inputs)
+{
+	sixtyNode* work_ptr = EShead;
+	while (work_ptr->next)
+	{
+		work_ptr = work_ptr->next;
+	}
+	LNode* p = data.get_head_ptr()->next;
+	istringstream ss(inputs);
+	string temp, code;
+	int score;
+	ss >> temp >> temp >> code >> score;
+	while (p)
+	{
+		if (p->key_stock.getCode() == code)
+		{
+			priceList pt = p->key_stock.getLog_ptr()->next;
+			sixtyNode* t = new sixtyNode;
+			t->name = p->key_stock.getName();
+			t->code = p->key_stock.getCode();
+			t->score = score;
+			t->close = pt->closePrice;
+			t->next = NULL;
+			work_ptr->next = t;
+			break;
+		}
+		p = p->next;
+	}
+}
+void sixtyList::easySort(string sortmode)
+{
+	sixtyNode* unsorted = EShead;
+	sixtyNode* sorted = new sixtyNode;
+	while (unsorted->next)
+	{
+		sixtyNode* tempun = unsorted->next;
+		int max_score = -1;
+		double max_close = -1;
+		while (tempun)
+		{
+			if (sortmode == "score" && tempun->score > max_score)
+				max_score = tempun->score;
+			else if (sortmode == "close" && tempun->close > max_close)
+				max_close = tempun->close;
+			tempun = tempun->next;
+		}
+		tempun = unsorted;
+		//cout << max_score << endl;
+		while (tempun->next)
+		{
+			if (tempun->next->score == max_score || tempun->next->close == max_close)
+				break;
+			else tempun = tempun->next;
+		}
+		sixtyNode* found = tempun->next;
+		tempun->next = found->next;
+		found->next = NULL;
+		sixtyNode* temps = sorted;
+		while (temps->next)
+		{
+			temps = temps->next;
+		}
+		temps->next = found;
+	}
+	EShead = sorted;
+}
+void sixtyList::showES()
+{
+	sixtyNode* p = EShead->next;
+	int pos = 1;
+	while (p)
+	{
+		cout << pos << ' ' << p->code << ' ' << p->name << ' ' << p->score << ' ' << p->close << endl;
+		pos++;
+		p = p->next;
+	}
+}

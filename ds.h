@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <sstream>
 
 #include "stock.h"
 
@@ -70,4 +71,36 @@ public:
 private:
 	BSNode* bsTree;
 	//ASL
+};
+
+class sixtyNode
+{
+public:
+	string name;
+	string code;
+	int score;
+	string date;
+	double rate;
+	double close;
+	sixtyNode* next;
+};
+class sixtyList
+{
+public:
+	sixtyList();
+	~sixtyList();
+	void creatQSList(LinkList&, string, string);
+	void creatESList(LinkList&, string);
+
+	void quickSort();
+	void QSort(int, int);
+	int partition(int, int);
+	void showQS();
+
+	void easySort(string);
+	void showES();
+private:
+	sixtyNode* QStable;
+	int length;
+	sixtyNode* EShead;
 };

@@ -14,8 +14,8 @@ using namespace libxl;
 class fileIO
 {
 public:
-	fileIO(string);							// read only
-	fileIO(string, bool, int, const char*);	// r/w
+	fileIO(string, int sheetnum = 0);	// read only
+	fileIO(string, string, string);		// r/w
 	~fileIO();
 	void readline(int);
 	void readtxt(stock&);
@@ -30,6 +30,4 @@ private:
 	Sheet* sheetread;
 
 	string strcont;
-	//double numcont;
 };
-

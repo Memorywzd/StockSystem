@@ -1,6 +1,6 @@
 #include "fileIO.h"
 
-fileIO::fileIO(string path)
+fileIO::fileIO(string path, int sheetnum)
 {
 	const char* pathc = path.data();
 	string dest = "./data/股票交易日志";
@@ -16,13 +16,13 @@ fileIO::fileIO(string path)
 		book->setKey("TommoT", "windows-2421220b07c2e10a6eb96768a2p7r6gc");
 		if (book->load(pathc))
 		{
-			sheetread = book->getSheet(0);
+			sheetread = book->getSheet(sheetnum);
 			path_to_save = path;
 		}
 	}
 }
 
-fileIO::fileIO(string path, bool writeflag, int sheetnum = 0, const char* savepath = "0")
+fileIO::fileIO(string path, string writeflag, string savepath)
 {
 	const char* pathc = path.data();
 	const char* txtpath = "./data/股票交易日志";
@@ -37,7 +37,7 @@ fileIO::fileIO(string path, bool writeflag, int sheetnum = 0, const char* savepa
 		book->setKey("TommoT", "windows-2421220b07c2e10a6eb96768a2p7r6gc");
 		if (book->load(pathc))
 		{
-			sheetread = book->getSheet(sheetnum);
+			sheetread = book->getSheet(0);
 			//if (savepath == "0")*path_to_save = *pathc;
 			//else *path_to_save = *savepath;
 		}

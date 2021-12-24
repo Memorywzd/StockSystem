@@ -26,6 +26,7 @@ public:
 	priceList getLog_ptr() { return tradeLog; }
 	string getCode() { return stockCode; }
 	string getName() { return stockName; }
+	string getCatg() { return firstCatg; }
 private:
 	string stockCode;		//¹ÉÆ±´úÂë
 	string stockName;		//¹ÉÆ±¼ò³Æ
@@ -51,4 +52,3 @@ private:
 	friend class LinkList;
 	friend class hashSearch;
 };
-

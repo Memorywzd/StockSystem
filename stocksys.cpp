@@ -8,14 +8,14 @@
 using namespace std;
 using namespace libxl;
 
-void initsys(LinkList& data_LinkList, fileIO& intro_file)
+void initsys(LinkList& data_LinkList, sixtyList& sixtydata_List, fileIO& intro_file, fileIO& mes_file)
 {
 	for (int i = 1; i <= 200; i++)
 	{
 		stock tempStock;
 
 		intro_file.readline(i);
-		tempStock.initStock(intro_file.get_cont_str());//初始化基本数据
+		tempStock.initStock(intro_file.get_cont_str());//初始化简介数据
 
 		string tradeLog_path;
 		tradeLog_path += "./data/股票交易日志/" + tempStock.getCode() + ".txt";
@@ -24,6 +24,11 @@ void initsys(LinkList& data_LinkList, fileIO& intro_file)
 		log_file.readtxt(tempStock);//初始化交易日志
 
 		data_LinkList.add_data(tempStock);//放入数据链表
+	}
+	for (int i = 1; i <= 60; i++)
+	{
+		mes_file.readline(i);
+		sixtydata_List.creatESList(data_LinkList, mes_file.get_cont_str());
 	}
 	/*LNode* temp = data_LinkList.get_head_ptr()->next;
 	while (temp)
@@ -44,10 +49,16 @@ int main()
 {
 	
 	LinkList data_LinkList;
+	sixtyList sixtydata_List;
+
 	fileIO intro_file("./data/A股公司简介.xlsx");
-	initsys(data_LinkList, intro_file);
+	fileIO mes_file("./data/60支股票信息.xlsx", 1);
+
+	initsys(data_LinkList, sixtydata_List, intro_file, mes_file);
+
 	hashSearch search_obj(data_LinkList);
 	BSTree bsTree(data_LinkList);
+
 	string dest_key;
 	/*cout << "哈希查找：输入股票代码，0结束输入" << endl;
 	while (cin >> dest_key && dest_key != "0")
@@ -69,12 +80,31 @@ int main()
 	{
 		data_LinkList.search_price_by_date(dest_key);
 	}*/
-	/*cout << "单链表日期排股价：输入日期，0结束输入" << endl;
+	/*cout << "日期直接插排股价：输入日期，0结束输入" << endl;
 	while (cin >> dest_key && dest_key != "0")
 	{
 		data_LinkList.creatPricelist(dest_key);
 		data_LinkList.insertSort("rate");
 	}*/
-	
+	/*cout << "行业快排涨跌幅：输入行业，0结束输入" << endl;
+	while (cin >> dest_key && dest_key != "0")
+	{
+		sixtyList* p = new sixtyList;
+		for (int i = 1; i <= 60; i++)
+		{
+			mes_file.readline(i);
+			p->creatQSList(data_LinkList, mes_file.get_cont_str(), dest_key);
+		}
+		p->quickSort();
+		p->showQS();
+		delete p;
+	}*/
+	/*cout << "简单插排评分、收盘价：没有输入" << endl;
+	sixtydata_List.easySort("score");
+	sixtydata_List.showES();
+	cout << endl;
+	sixtydata_List.easySort("close");
+	sixtydata_List.showES();*/
+
 	return 0;
 }
