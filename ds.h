@@ -68,6 +68,7 @@ class BSTree
 public:
 	BSTree(LinkList&);
 	void BSsearch(string);
+	void deleteBST(string);
 private:
 	BSNode* bsTree;
 	//ASL
@@ -76,6 +77,7 @@ private:
 class sixtyNode
 {
 public:
+	int index;
 	string name;
 	string code;
 	int score;
@@ -99,8 +101,35 @@ public:
 
 	void easySort(string);
 	void showES();
+
+	string getNameByIndex(int);
 private:
 	sixtyNode* QStable;
 	int length;
 	sixtyNode* EShead;
+	friend class AMGraph;
 };
+
+class AMGraph
+{
+public:
+	AMGraph();
+	void creatUDNv(sixtyList&);
+	void creatUDNa(string);
+
+	void floyd();
+	void getMinLen(string, string, string&, string&);
+	void prime(sixtyList&, int pos = -1);
+private:
+	sixtyNode vexs[60];
+	int arcs[60][60];
+	int vexnum, arcnum;
+	int d[60][60];
+	int path[60][60];
+	struct edge
+	{
+		int adjvex;
+		int lowcost;
+	}closedge[60];
+};
+

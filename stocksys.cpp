@@ -2,13 +2,13 @@
 #include "libxl.h"
 
 #include "fileIO.h"
-#include "stock.h"
 #include "ds.h"
 
 using namespace std;
 using namespace libxl;
 
-void initsys(LinkList& data_LinkList, sixtyList& sixtydata_List, fileIO& intro_file, fileIO& mes_file)
+void initsys(LinkList& data_LinkList, sixtyList& sixtydata_List, AMGraph& graph,
+			 fileIO& intro_file, fileIO& mes_file, fileIO& graph_file)
 {
 	for (int i = 1; i <= 200; i++)
 	{
@@ -30,6 +30,12 @@ void initsys(LinkList& data_LinkList, sixtyList& sixtydata_List, fileIO& intro_f
 		mes_file.readline(i);
 		sixtydata_List.creatESList(data_LinkList, mes_file.get_cont_str());
 	}
+	graph.creatUDNv(sixtydata_List);
+	for (int i = 1; i <= 83; i++)
+	{ 
+		graph_file.readline(i);
+		graph.creatUDNa(graph_file.get_cont_str());
+	}
 	/*LNode* temp = data_LinkList.get_head_ptr()->next;
 	while (temp)
 	{
@@ -50,11 +56,13 @@ int main()
 	
 	LinkList data_LinkList;
 	sixtyList sixtydata_List;
+	AMGraph graph;
 
 	fileIO intro_file("./data/A股公司简介.xlsx");
 	fileIO mes_file("./data/60支股票信息.xlsx", 1);
+	fileIO graph_file("./data/60支股票信息.xlsx", 0);
 
-	initsys(data_LinkList, sixtydata_List, intro_file, mes_file);
+	initsys(data_LinkList, sixtydata_List, graph, intro_file, mes_file, graph_file);
 
 	hashSearch search_obj(data_LinkList);
 	BSTree bsTree(data_LinkList);
@@ -70,10 +78,11 @@ int main()
 	{
 		data_LinkList.KMP_search(dest_key);
 	}*/
-	/*cout << "二叉排序树查找：输入股票代码，0结束输入" << endl;
+	/*cout << "二叉排序树查找、删除：输入股票代码，0结束输入" << endl;
 	while (cin >> dest_key && dest_key != "0")
 	{
 		bsTree.BSsearch(dest_key);
+		bsTree.deleteBST(dest_key);
 	}*/
 	/*cout << "单链表日期查股价：输入日期，0结束输入" << endl;
 	while (cin >> dest_key && dest_key != "0")
@@ -105,6 +114,19 @@ int main()
 	cout << endl;
 	sixtydata_List.easySort("close");
 	sixtydata_List.showES();*/
+	/*cout << "求最短路径：输入两个点的序号或名称或代码，0结束输入" << endl;
+	while (cin >> dest_key && dest_key != "0")
+	{
+		string* dest2 = new string;
+		cin >> *dest2;
+		string* len = new string;
+		string* rst = new string;
+		graph.getMinLen(dest_key, *dest2, *len, *rst);
+		cout << *len << ": " << *rst << endl;
+		delete dest2, len, rst;
+	}*/
+	/*cout << "prim基金筛选，无输入" << endl;
+	graph.prime(sixtydata_List, 2);*/
 
 	return 0;
 }

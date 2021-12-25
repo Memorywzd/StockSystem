@@ -205,6 +205,64 @@ void BSTree::BSsearch(string key)
 		cout << endl;
 	}
 }
+void BSTree::deleteBST(string key_code)
+{
+	BSNode* p = bsTree, * f = NULL;
+	while (p)
+	{
+		if (p->key_code == key_code)
+			break;
+		f = p;
+		if (p->key_code > key_code)
+			p = p->lchild;
+		else p = p->rchild;
+	}
+	if (!p)
+	{
+		cout << "没有该股票信息！" << endl;
+		return;
+	}
+	BSNode* q = p;
+	BSNode* s;
+	if (p->lchild && p->rchild)
+	{
+		s = p->lchild;
+		while (s->rchild)
+		{
+			q = s;
+			s = s->rchild;
+		}
+		p->key_code = s->key_code;
+		if (q != p)
+			q->rchild = s->lchild;
+		else q->lchild = s->lchild;
+		delete s;
+		cout << p->key_code << ' ';
+		cout << p->lchild->key_code << ' ' << p->rchild->key_code << endl;
+		return;
+	}
+	else if (!p->rchild)
+		p = p->lchild;
+	else if (!p->lchild)
+		p = p->rchild;
+	if (!f)
+		bsTree = p;
+	else if (q == f->lchild)
+		f->lchild = p;
+	else f->rchild = p;
+	delete q;
+	if (p)
+	{
+		cout << p->key_code << ' ';
+		if (p->lchild)
+			cout << p->lchild->key_code << ' ';
+		else cout << "新节点左子树为空！" << ' ';
+		if (p->rchild) 
+			cout << p->rchild->key_code << endl;
+		else cout << "新节点右子树为空！" << endl;
+	}
+	else cout << "该节点为叶子节点" << endl;
+}
 
 void LinkList::search_price_by_date(string date)
 {
@@ -403,14 +461,15 @@ void sixtyList::creatESList(LinkList& data, string inputs)
 	LNode* p = data.get_head_ptr()->next;
 	istringstream ss(inputs);
 	string temp, code;
-	int score;
-	ss >> temp >> temp >> code >> score;
+	int index,score;
+	ss >> index >> temp >> code >> score;
 	while (p)
 	{
 		if (p->key_stock.getCode() == code)
 		{
 			priceList pt = p->key_stock.getLog_ptr()->next;
 			sixtyNode* t = new sixtyNode;
+			t->index = index;
 			t->name = p->key_stock.getName();
 			t->code = p->key_stock.getCode();
 			t->score = score;
@@ -465,8 +524,205 @@ void sixtyList::showES()
 	int pos = 1;
 	while (p)
 	{
-		cout << pos << ' ' << p->code << ' ' << p->name << ' ' << p->score << ' ' << p->close << endl;
+		cout << p->index << ' ' << p->code << ' ' << p->name << ' ' << p->score << ' ' << p->close << endl;
 		pos++;
 		p = p->next;
+	}
+}
+string sixtyList::getNameByIndex(int index)
+{
+	sixtyNode* p = EShead->next;
+	while (p)
+	{
+		if (p->index == index)
+			return p->name;
+		p = p->next;
+	}
+}
+
+AMGraph::AMGraph()
+{
+	vexnum = 0;
+	arcnum = 0;
+	for (int i = 0; i < 60; i++)
+	{
+		for (int j = 0; j < 60; j++)
+		{
+			arcs[i][j] = 32767;
+		}
+	}
+}
+void AMGraph::creatUDNv(sixtyList &lst)
+{
+	sixtyNode* p = lst.EShead->next;
+	while (p)
+	{
+		vexs[vexnum].index = p->index;
+		vexs[vexnum].name = p->name;
+		vexnum++;
+		p = p->next;
+	}
+}
+void AMGraph::creatUDNa(string inputs)
+{
+	istringstream ss(inputs);
+	int index1, index2, weight;
+	ss >> index1 >> index2 >> weight;
+	index1--;
+	index2--;
+	arcs[index1][index2] = weight;
+	arcs[index2][index1] = weight;
+	arcnum++;
+}
+void AMGraph::floyd()
+{
+	for (int i = 0; i < vexnum; i++)
+	{
+		for (int j = 0; j < vexnum; j++)
+		{
+			d[i][j] = arcs[i][j];
+			if (d[i][j] < 32767 && i != j)
+				path[i][j] = i;
+			else path[i][j] = -1;
+		}
+	}
+	for (int k = 0; k < vexnum; k++)
+	{
+		for (int i = 0; i < vexnum; i++)
+		{
+			for (int j = 0; j < vexnum; j++)
+			{
+				if (d[i][k] + d[k][j] < d[i][j])
+				{
+					d[i][j] = d[i][k] + d[k][j];
+					path[i][j] = path[k][j];
+				}
+			}
+		}
+	}
+}
+void AMGraph::getMinLen(string index1, string index2, string& min_len, string& rst)
+{
+	floyd();
+	int pos1 = 61, pos2 = 61;
+	istringstream ss1(index1), ss2(index2);
+	if (!(ss1 >> pos1 && ss2 >> pos2))
+	{
+		for (int i = 0; i < 60; i++)
+		{
+			if (vexs[i].name == index1 || vexs[i].code == index1)
+				pos1 = i;
+			else if (vexs[i].name == index2 || vexs[i].code == index2)
+				pos2 = i;
+		}
+	}
+	pos1--;
+	pos2--;
+	bool legpos = true;
+	if (pos1 >= 0 && pos1 < 60)legpos = false;
+	else if (pos2 >= 0 && pos2 < 60)legpos = false;
+	if (legpos)
+	{
+		min_len += "输入的点不存在";
+		rst += "无路径";
+	}
+	else if (pos1 == pos2)
+	{
+		min_len += "0";
+		rst += to_string(pos1 + 1) + ' ' + to_string(pos1 + 1);
+	}
+	else if (d[pos1][pos2] == 32767)
+	{
+		min_len += "两点不连通";
+		rst += "无路径";
+	}
+	else
+	{
+		min_len = to_string(d[pos1][pos2]);
+		while (path[pos1][pos2] != pos1)
+		{
+			rst += to_string(pos2 + 1) + ' ';
+			pos2 = path[pos1][pos2];
+		}
+		rst += to_string(pos2 + 1) + ' ';
+		rst += to_string(pos1 + 1) + ' ';
+	}
+}
+
+void AMGraph::prime(sixtyList& lst,int pos)
+{
+	lst.easySort("score");
+	floyd();
+	int initw = 32767, posnow;
+	for (int i = 0; i < 60; i++)
+	{
+		for (int j = 0; j < 60; j++)
+		{
+			if (d[i][j] < initw)
+			{
+				initw = d[i][j];
+				posnow = i;
+			}
+		}
+	}
+	if (pos != -1)posnow = --pos;
+	for (int i = 0; i < vexnum; i++)
+	{
+		if (i != posnow)
+		{
+			closedge[i].adjvex = posnow;
+			closedge[i].lowcost = d[posnow][i];
+		}
+	}
+	closedge[posnow].lowcost = 0;
+	int count = 0;
+	int posnext;
+	for (int i = 1; i < vexnum; i++)
+	{
+		int minw = 32767;
+		int temp;
+		for (int j = 0; j < vexnum; j++)
+			if (j != posnow && closedge[j].lowcost != 0 && closedge[j].lowcost < minw)
+			{
+				minw = closedge[j].lowcost;
+				temp = j;
+			}
+		for (int j = 0; j < vexnum; j++)
+		{
+			if (minw != d[posnow][temp])
+			{
+				posnext = temp;
+				break;
+			}
+			sixtyNode* p = lst.EShead->next;
+			bool find = false;
+			while (p)
+			{
+				if (closedge[j].lowcost == minw && p->index == j)
+				{
+					posnext = j;
+					find = true;
+					break;
+				}
+				p = p->next;
+			}
+			if (find)break;
+		}
+		count++;
+		if (count < 6)
+		{
+			cout << minw << ' ' << closedge[posnext].adjvex + 1 << ": " << lst.getNameByIndex(closedge[posnext].adjvex + 1) << ' ';
+			cout << posnext + 1 << ": " << lst.getNameByIndex(posnext + 1) << endl;
+		}
+		closedge[posnext].lowcost = 0;
+		for (int j = 0; j < vexnum; j++)
+		{
+			if (closedge[j].lowcost != 0 && d[posnext][j] < closedge[j].lowcost)
+			{
+				closedge[j].adjvex = posnext;
+				closedge[j].lowcost = d[posnext][j];
+			}
+		}
+		posnow = posnext;
 	}
 }
