@@ -647,11 +647,11 @@ void AMGraph::getMinLen(string index1, string index2, string& min_len, string& r
 		rst += to_string(pos2 + 1) + ' ';
 		rst += to_string(pos1 + 1) + ' ';
 	}
+	reverse(rst.begin(), rst.end());
 }
 
 void AMGraph::prime(sixtyList& lst,int pos)
 {
-	lst.easySort("score");
 	floyd();
 	int initw = 32767, posnow;
 	for (int i = 0; i < 60; i++)
@@ -665,7 +665,7 @@ void AMGraph::prime(sixtyList& lst,int pos)
 			}
 		}
 	}
-	if (pos != -1)posnow = --pos;
+	if (pos != -1 && pos > 0 && pos < 61)posnow = --pos;
 	for (int i = 0; i < vexnum; i++)
 	{
 		if (i != posnow)
@@ -687,32 +687,29 @@ void AMGraph::prime(sixtyList& lst,int pos)
 				minw = closedge[j].lowcost;
 				temp = j;
 			}
-		for (int j = 0; j < vexnum; j++)
+		posnext = temp;
+		tedges[i - 1].w = minw;
+		tedges[i - 1].pos1 = closedge[posnext].adjvex + 1;
+		tedges[i - 1].pos2 = posnext + 1;
+		tedges[i - 1].name1 = lst.getNameByIndex(tedges[i - 1].pos1);
+		tedges[i - 1].name2 = lst.getNameByIndex(tedges[i - 1].pos2);
+		tedges[i - 1].totalscore = 0;
+		bool find1 = false, find2 = false;
+		sixtyNode* p = lst.EShead->next;
+		while (p)
 		{
-			if (minw != d[posnow][temp])
+			if (p->index == (tedges[i - 1].pos1))
 			{
-				posnext = temp;
-				break;
+				tedges[i - 1].totalscore += p->score;
+				find1 = true;
 			}
-			sixtyNode* p = lst.EShead->next;
-			bool find = false;
-			while (p)
+			if (p->index == (tedges[i - 1].pos2))
 			{
-				if (closedge[j].lowcost == minw && p->index == j)
-				{
-					posnext = j;
-					find = true;
-					break;
-				}
-				p = p->next;
+				tedges[i - 1].totalscore += p->score;
+				find1 = true;
 			}
-			if (find)break;
-		}
-		count++;
-		if (count < 6)
-		{
-			cout << minw << ' ' << closedge[posnext].adjvex + 1 << ": " << lst.getNameByIndex(closedge[posnext].adjvex + 1) << ' ';
-			cout << posnext + 1 << ": " << lst.getNameByIndex(posnext + 1) << endl;
+			if (find1 && find2)break;
+			p = p->next;
 		}
 		closedge[posnext].lowcost = 0;
 		for (int j = 0; j < vexnum; j++)
@@ -725,4 +722,207 @@ void AMGraph::prime(sixtyList& lst,int pos)
 		}
 		posnow = posnext;
 	}
+	for (int i = 0; i < 58; i++)
+	{
+		int t = i;
+		int temp1, temp2, temp3;
+		string temp4, temp5;
+		int temp6;
+		for (int j = i + 1; j < 59; j++)
+		{
+			if (tedges[j].w < tedges[t].w)
+				t = j;
+		}
+		if (t != i)
+		{
+			temp1 = tedges[i].w;
+			temp2 = tedges[i].pos1;
+			temp3 = tedges[i].pos2;
+			temp4 = tedges[i].name1;
+			temp5 = tedges[i].name2;
+			temp6 = tedges[i].totalscore;
+			tedges[i].w = tedges[t].w;
+			tedges[i].pos1 = tedges[t].pos1;
+			tedges[i].pos2 = tedges[t].pos2;
+			tedges[i].name1 = tedges[t].name1;
+			tedges[i].name2 = tedges[t].name2;
+			tedges[i].totalscore = tedges[t].totalscore;
+			tedges[t].w = temp1;
+			tedges[t].pos1 = temp2;
+			tedges[t].pos2 = temp3;
+			tedges[t].name1 = temp4;
+			tedges[t].name2 = temp5;
+			tedges[t].totalscore = temp6;
+		}
+	}
+	for (int i = 0; i < 59; i++)
+	{
+		int t = i;
+		int temp1, temp2, temp3;
+		string temp4, temp5;
+		int temp6;
+		for (int j = i + 1; j < 60; j++)
+		{
+			if (tedges[j].w == tedges[t].w &&
+				tedges[j].totalscore > tedges[t].totalscore)
+				t = j;
+		}
+		if (t != i)
+		{
+			temp1 = tedges[i].w;
+			temp2 = tedges[i].pos1;
+			temp3 = tedges[i].pos2;
+			temp4 = tedges[i].name1;
+			temp5 = tedges[i].name2;
+			temp6 = tedges[i].totalscore;
+			tedges[i].w = tedges[t].w;
+			tedges[i].pos1 = tedges[t].pos1;
+			tedges[i].pos2 = tedges[t].pos2;
+			tedges[i].name1 = tedges[t].name1;
+			tedges[i].name2 = tedges[t].name2;
+			tedges[i].totalscore = tedges[t].totalscore;
+			tedges[t].w = temp1;
+			tedges[t].pos1 = temp2;
+			tedges[t].pos2 = temp3;
+			tedges[t].name1 = temp4;
+			tedges[t].name2 = temp5;
+			tedges[t].totalscore = temp6;
+		}
+	}
+	for (int i = 0; i < 6; i++)
+	{
+		cout << tedges[i].w << ' ' << tedges[i].pos1 << ": " << tedges[i].name1 << ' ';
+		cout << tedges[i].pos2 << ": " << tedges[i].name2 << ' ' << tedges[i].totalscore << endl;
+	}
+}
+
+void AMGraph::kruskal(sixtyList& lst)
+{
+	floyd();
+	for (int i = 0; i < vexnum; i++)
+	{
+		for (int j = 0; j < vexnum; j++)
+		{
+			bool find1 = false, find2 = false;
+			int pos = 60 * i + j;
+			edge[pos].head = i;
+			edge[pos].tail = j;
+			edge[pos].lowcost = d[i][j];
+			edge[pos].totalscore = 0;
+			sixtyNode* p = lst.EShead->next;
+			while (p)
+			{
+				if (p->index == (j + 1))
+				{
+					edge[pos].totalscore += p->score;
+					find1 = true;
+				}
+				if(p->index == (i + 1))
+				{
+					edge[pos].totalscore += p->score;
+					find1 = true;
+				}
+				if (find1 && find2)break;
+				p = p->next;
+			}
+		}
+		vexset[i] = i;
+	}
+	for (int i = 0; i < 3599; i++)
+	{
+		int t = i;
+		int temp1, temp2, temp3, temp4;
+		for (int j = i + 1; j < 3600; j++)
+		{
+			if (edge[j].lowcost < edge[t].lowcost)
+				t = j;
+		}
+		if (t != i)
+		{
+			temp1 = edge[i].head;
+			temp2 = edge[i].tail;
+			temp3 = edge[i].lowcost;
+			temp4 = edge[i].totalscore;
+			edge[i].head = edge[t].head;
+			edge[i].tail = edge[t].tail;
+			edge[i].lowcost = edge[t].lowcost;
+			edge[i].totalscore = edge[t].totalscore;
+			edge[t].head = temp1;
+			edge[t].tail = temp2;
+			edge[t].lowcost = temp3;
+			edge[t].totalscore = temp4;
+		}
+	}
+	for (int i = 0; i < 3599; i++)
+	{
+		int t = i;
+		int temp1, temp2, temp3, temp4;
+		for (int j = i + 1; j < 3600; j++)
+		{
+			if (edge[j].lowcost == edge[t].lowcost && 
+				edge[j].totalscore > edge[t].totalscore)
+				t = j;
+		}
+		if (t != i)
+		{
+			temp1 = edge[i].head;
+			temp2 = edge[i].tail;
+			temp3 = edge[i].lowcost;
+			temp4 = edge[i].totalscore;
+			edge[i].head = edge[t].head;
+			edge[i].tail = edge[t].tail;
+			edge[i].lowcost = edge[t].lowcost;
+			edge[i].totalscore = edge[t].totalscore;
+			edge[t].head = temp1;
+			edge[t].tail = temp2;
+			edge[t].lowcost = temp3;
+			edge[t].totalscore = temp4;
+		}
+	}
+	int count = 0;
+	for (int i = 0; i < 3600; i++)
+	{
+		if (vexset[edge[i].head] != vexset[edge[i].tail])
+		{
+			if (count++ < 6)
+			{
+				cout << edge[i].lowcost << ' ';
+				cout << edge[i].head + 1 << ": " << lst.getNameByIndex(edge[i].head + 1) << ' ';
+				cout << edge[i].tail + 1 << ": " << lst.getNameByIndex(edge[i].tail + 1) << ' ';
+				cout << edge[i].totalscore << endl;
+			}
+			for (int j = 0; j < 60; j++)
+			{
+				if (vexset[j] == vexset[edge[i].tail])
+					vexset[j] = vexset[edge[i].head];
+			}
+		}
+	}
+}
+
+void AMGraph::bip(int* inputs)
+{
+	int points_ind[10];
+	int sides[10][10];
+	for (int i = 0; i < 10; i++)
+	{
+		points_ind[i] = inputs[i];
+		points_ind[i]--;
+	}
+	for (int i = 0; i < 10; i++)
+	{
+		for (int j = 0; j < 10; j++)
+		{
+			sides[i][j] = arcs[points_ind[i]][points_ind[j]];
+		}
+	}
+	for (int i = 0; i < 10; i++)
+	{
+		for (int j = 0; j < 10; j++)
+		{
+			cout << setw(8) << sides[i][j];
+		}
+		cout << endl;
+	}
+	
 }

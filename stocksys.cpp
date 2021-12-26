@@ -125,8 +125,24 @@ int main()
 		cout << *len << ": " << *rst << endl;
 		delete dest2, len, rst;
 	}*/
-	/*cout << "prim基金筛选，无输入" << endl;
-	graph.prime(sixtydata_List, 2);*/
-
+	/*cout << "prim，kruskal基金筛选，输入prim的起始点，0结束输入" << endl;
+	int pos;
+	while (cin >> pos && pos != 0)
+	{
+		graph.prime(sixtydata_List, pos);
+		cout << endl;
+		graph.kruskal(sixtydata_List);
+	}*/
+	cout << "二部图基金筛选，输入10个点，0结束输入" << endl;
+	int num[10];
+	while (cin >> num[0] && num[0] != 0)
+	{
+		for (int i = 1; i < 10; i++)
+		{
+			cin >> num[i];
+		}
+		graph.bip(num);
+	}
+	
 	return 0;
 }

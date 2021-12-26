@@ -3,6 +3,8 @@
 #include <iostream>
 #include <sstream>
 
+#include <iomanip>
+
 #include "stock.h"
 
 using namespace std;
@@ -120,16 +122,35 @@ public:
 	void floyd();
 	void getMinLen(string, string, string&, string&);
 	void prime(sixtyList&, int pos = -1);
+	void kruskal(sixtyList&);
+	void bip(int*);
 private:
 	sixtyNode vexs[60];
 	int arcs[60][60];
 	int vexnum, arcnum;
 	int d[60][60];
 	int path[60][60];
-	struct edge
+	struct closedge
 	{
 		int adjvex;
 		int lowcost;
 	}closedge[60];
+	struct tedge
+	{
+		int w;
+		int pos1;
+		int pos2;
+		string name1;
+		string name2;
+		int totalscore;
+	}tedges[59];
+	struct kedge
+	{
+		int head;
+		int tail;
+		int lowcost;
+		int totalscore;
+	}edge[3600];
+	int vexset[60];
 };
 
