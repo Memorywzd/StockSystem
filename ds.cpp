@@ -900,14 +900,18 @@ void AMGraph::kruskal(sixtyList& lst)
 	}
 }
 
-void AMGraph::bip(int* inputs)
+void AMGraph::bip(sixtyList& lst, int* inputs)
 {
 	int points_ind[10];
 	int sides[10][10];
+	int color[10];
+	int stack[10], top = 0;
+	bool isBip = true;
 	for (int i = 0; i < 10; i++)
 	{
 		points_ind[i] = inputs[i];
 		points_ind[i]--;
+		color[i] = -1;
 	}
 	for (int i = 0; i < 10; i++)
 	{
@@ -924,5 +928,29 @@ void AMGraph::bip(int* inputs)
 		}
 		cout << endl;
 	}
-	
+	color[0] = 1;
+	stack[top++] = points_ind[0];
+	while (top > 0)
+	{
+		int top_p = stack[--top];
+		for (int i = 0; i < 10; i++)
+		{
+			if (sides[top_p][i] < 32767 && color[i] == -1)
+			{
+				color[i] = !color[top_p];
+				stack[top++] = i;
+			}
+			else if (sides[top_p][i] < 32767 && color[top_p] == color[i])
+				isBip = false;
+		}
+	}
+	if (isBip)
+	{
+		for (int i = 0; i < 10; i++)
+		{
+			cout << points_ind[i] << ' ';
+			cout << lst.getNameByIndex(points_ind[i] + 1) << endl;
+		}
+	}
+	else cout << "不能构成二部图！" << endl;
 }

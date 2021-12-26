@@ -123,7 +123,7 @@ public:
 	void getMinLen(string, string, string&, string&);
 	void prime(sixtyList&, int pos = -1);
 	void kruskal(sixtyList&);
-	void bip(int*);
+	void bip(sixtyList&, int*);
 private:
 	sixtyNode vexs[60];
 	int arcs[60][60];

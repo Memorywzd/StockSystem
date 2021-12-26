@@ -133,7 +133,7 @@ int main()
 		cout << endl;
 		graph.kruskal(sixtydata_List);
 	}*/
-	cout << "二部图基金筛选，输入10个点，0结束输入" << endl;
+	/*cout << "二部图基金筛选，输入10个点，0结束输入" << endl;
 	int num[10];
 	while (cin >> num[0] && num[0] != 0)
 	{
@@ -141,8 +141,8 @@ int main()
 		{
 			cin >> num[i];
 		}
-		graph.bip(num);
-	}
+		graph.bip(sixtydata_List, num);
+	}*/
 	
 	return 0;
 }
