@@ -29,6 +29,30 @@ fileIO::fileIO(string path, string writeflag, int sheetnum)
 	sheetwrite = book->addSheet(to_string(sheetnum).c_str());
 	path_to_save = path;
 }
+void fileIO::write(string s, int col, int row)
+{
+	string sline;
+	istringstream ss(s);
+	if (row == -1)
+	{
+		string* trash = new string;
+		getline(ss, *trash);
+		delete trash;
+		row = 1;
+	}
+	while (getline(ss, sline))
+	{
+		istringstream slines(sline);
+		string t;
+		for (int i = 0; i < col; i++)
+		{
+			slines >> t;
+			sheetwrite->writeStr(row, i, t.c_str());
+		}
+		row++;
+	}
+}
+
 
 fileIO::~fileIO()
 {

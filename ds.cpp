@@ -424,16 +424,19 @@ void LinkList::insertSort(int sortmode, QTextEdit*& show)
 		unsorted = unnext;
 	}
 	priceList p = price_sort->next;
+	fileIO* writef = new fileIO("./data/价格和涨跌幅排序结果.xlsx", "write", sortmode);
+	string title("股票代码 股票名称 开盘价 收盘价 涨跌幅 " + p->tradeDate);
+	writef->write(title, 6, 0);
 	while (p)
 	{
 		oss << p->code << ' ' << p->name << ' ';
 		oss << setw(20) << setiosflags(ios::right) << p->openPrice << ' ';
 		oss << setw(20) << setiosflags(ios::right) << p->closePrice << ' ';
 		oss << setw(20) << setiosflags(ios::right) << p->quotePerChange << '%' << endl;
-		p = p->next;
+		p = p->next; 
 	}
-	fileIO* writef = new fileIO("./data/价格和涨跌幅排序结果.xlsx", "write", sortmode);
-
+	writef->write(oss.str(), 5);
+	delete writef;
 	show->append(QString::fromLocal8Bit(oss.str().c_str()));
 }
 
@@ -601,20 +604,29 @@ void sixtyList::easySort(string sortmode, QTextEdit*& show)
 		temps->next = found;
 	}
 	EShead = sorted;
-	showES(show);
+	showES(sortmode, show);
 }
-void sixtyList::showES(QTextEdit*& show)
+void sixtyList::showES(string sortmod, QTextEdit*& show)
 {
 	ostringstream oss;
 	sixtyNode* p = EShead->next;
 	int pos = 1;
+	fileIO* writef;
+	if (sortmod == "score")
+		writef = new fileIO("./data/评分排序.xlsx", "write", 0);
+	else if(sortmod == "close")
+		writef = new fileIO("./data/收盘价排序.xlsx", "write", 0);
+	string title("序号 股票名称 股票代码 评分 收盘价");
+	writef->write(title, 5, 0);
 	while (p)
 	{
-		oss << p->index << ' ' << p->code << ' ' << p->name << ' ' << setw(15) << p->score << ' ';
+		oss << pos << ' ' << p->code << ' ' << p->name << ' ' << setw(15) << p->score << ' ';
 		oss << setw(15) << p->close << endl;
 		pos++;
 		p = p->next;
 	}
+	writef->write(oss.str(), 5, 1);
+	delete writef;
 	show->append(QString::fromLocal8Bit(oss.str().c_str()));
 }
 string sixtyList::getNameByIndex(int index)

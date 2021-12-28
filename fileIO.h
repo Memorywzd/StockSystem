@@ -19,6 +19,7 @@ public:
 	~fileIO();
 	void readline(int);
 	void readtxt(stock&);
+	void write(string, int col, int row = -1);
 	string get_cont_str() { return strcont; }
 
 private:

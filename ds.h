@@ -105,7 +105,7 @@ public:
 	void showQS(QTextEdit*&);
 
 	void easySort(string, QTextEdit*&);
-	void showES(QTextEdit*&);
+	void showES(string, QTextEdit*&);
 
 	string getNameByIndex(int);
 private:
