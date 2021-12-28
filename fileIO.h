@@ -15,7 +15,7 @@ class fileIO
 {
 public:
 	fileIO(string, int sheetnum = 0);	// read only
-	fileIO(string, string, string);		// r/w
+	fileIO(string, string, int);		// r/w
 	~fileIO();
 	void readline(int);
 	void readtxt(stock&);
@@ -28,6 +28,7 @@ private:
 	ifstream txtfile;
 	Book* book;
 	Sheet* sheetread;
+	Sheet* sheetwrite;
 
 	string strcont;
 };

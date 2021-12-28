@@ -2,10 +2,13 @@
 
 #include <iostream>
 #include <sstream>
+#include <QTextEdit>
+
 
 #include <iomanip>
 
 #include "stock.h"
+#include "fileIO.h"
 
 using namespace std;
 
@@ -22,13 +25,13 @@ public:
 	~LinkList();
 	void add_data(stock);
 
-	void KMP_search(string);
+	void KMP_search(string, QTextEdit*&);
 	void get_next_val(string);
 
-	void search_price_by_date(string);
+	void search_price_by_date(string, QTextEdit*&);
 
-	void creatPricelist(string);
-	void insertSort(string);
+	void creatPricelist(string, QTextEdit*&);
+	void insertSort(int, QTextEdit*&);
 
 	LNode* get_head_ptr() { return head; }
 private:
@@ -48,9 +51,9 @@ public:
 class hashSearch
 {
 public:
-	hashSearch(LinkList&);
+	hashSearch(LinkList*&);
 	int get_hash(string);
-	void hash_search(string);
+	void hash_search(string, QTextEdit*&);
 private:
 	hashNode* hashTable[97];
 	double factor = 200.0 / 97;//wrong
@@ -68,9 +71,9 @@ public:
 class BSTree
 {
 public:
-	BSTree(LinkList&);
-	void BSsearch(string);
-	void deleteBST(string);
+	BSTree(LinkList*&);
+	void BSsearch(string, QTextEdit*&);
+	void deleteBST(string, QTextEdit*&);
 private:
 	BSNode* bsTree;
 	//ASL
@@ -82,7 +85,7 @@ public:
 	int index;
 	string name;
 	string code;
-	int score;
+	double score;
 	string date;
 	double rate;
 	double close;
@@ -93,16 +96,16 @@ class sixtyList
 public:
 	sixtyList();
 	~sixtyList();
-	void creatQSList(LinkList&, string, string);
-	void creatESList(LinkList&, string);
+	void creatQSList(LinkList*&, string, string);
+	void creatESList(LinkList*&, string);
 
 	void quickSort();
 	void QSort(int, int);
 	int partition(int, int);
-	void showQS();
+	void showQS(QTextEdit*&);
 
-	void easySort(string);
-	void showES();
+	void easySort(string, QTextEdit*&);
+	void showES(QTextEdit*&);
 
 	string getNameByIndex(int);
 private:
@@ -116,14 +119,14 @@ class AMGraph
 {
 public:
 	AMGraph();
-	void creatUDNv(sixtyList&);
+	void creatUDNv(sixtyList*&);
 	void creatUDNa(string);
 
 	void floyd();
-	void getMinLen(string, string, string&, string&);
-	void prime(sixtyList&, int pos = -1);
-	void kruskal(sixtyList&);
-	void bip(sixtyList&, int*);
+	void getMinLen(string, string, QTextEdit*&);
+	void prime(sixtyList*&, QTextEdit*&, int pos = -1);
+	void kruskal(sixtyList*&, QTextEdit*&);
+	void bip(sixtyList*&, int*, QTextEdit*&);
 private:
 	sixtyNode vexs[60];
 	int arcs[60][60];
@@ -142,15 +145,34 @@ private:
 		int pos2;
 		string name1;
 		string name2;
-		int totalscore;
+		double totalscore;
 	}tedges[59];
 	struct kedge
 	{
 		int head;
 		int tail;
 		int lowcost;
-		int totalscore;
+		double totalscore;
 	}edge[3600];
 	int vexset[60];
 };
 
+class ds
+{
+public:
+	ds();
+	LinkList* data_LinkList;
+	sixtyList* sixtydata_List;
+	AMGraph* graph;
+
+	fileIO* intro_file;
+	fileIO* mes_file;
+	fileIO* graph_file;
+
+	hashSearch* search_obj;
+	BSTree* bsTree;
+
+private:
+	void initds(LinkList*&, sixtyList*&, AMGraph*&,
+				fileIO*&, fileIO*&, fileIO*&);
+};

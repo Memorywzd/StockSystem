@@ -1,5 +1,54 @@
 #include "ds.h"
 
+ds::ds()
+{
+	data_LinkList = new LinkList;
+	sixtydata_List = new sixtyList;
+	graph = new AMGraph;
+	intro_file = new fileIO("./data/A股公司简介.xlsx");
+	mes_file = new fileIO("./data/60支股票信息.xlsx", 1);
+	graph_file = new fileIO("./data/60支股票信息.xlsx", 0);
+
+	initds(data_LinkList, sixtydata_List, graph, intro_file, mes_file, graph_file);
+
+	search_obj = new hashSearch(data_LinkList);
+	bsTree = new BSTree(data_LinkList);
+}
+
+void ds::initds(LinkList*& data_LinkList, sixtyList*& sixtydata_List, AMGraph*& graph,
+	fileIO*& intro_file, fileIO*& mes_file, fileIO*& graph_file)
+{
+	for (int i = 1; i <= 200; i++)
+	{
+		stock tempStock;
+
+		intro_file->readline(i);
+		tempStock.initStock(intro_file->get_cont_str());//初始化简介数据
+
+		string tradeLog_path;
+		tradeLog_path += "./data/股票交易日志/" + tempStock.getCode() + ".txt";
+		fileIO* log_file;
+		log_file = new fileIO(tradeLog_path);
+		tempStock.initTradeLog();
+		log_file->readtxt(tempStock);//初始化交易日志
+		delete log_file;
+
+		data_LinkList->add_data(tempStock);//放入数据链表
+	}
+	for (int i = 1; i <= 60; i++)
+	{
+		mes_file->readline(i);
+		sixtydata_List->creatESList(data_LinkList, mes_file->get_cont_str());
+	}
+	graph->creatUDNv(sixtydata_List);
+	for (int i = 1; i <= 83; i++)
+	{
+		graph_file->readline(i);
+		graph->creatUDNa(graph_file->get_cont_str());
+	}
+}
+
+
 LinkList::LinkList()
 {
 	head = new LNode;
@@ -32,10 +81,10 @@ void LinkList::add_data(stock s)
 	length++;
 }
 
-hashSearch::hashSearch(LinkList& intro)
+hashSearch::hashSearch(LinkList*& intro)
 {
 	int hashtemp;
-	LNode* introPtr = intro.get_head_ptr()->next;
+	LNode* introPtr = intro->get_head_ptr()->next;
 	for (int i = 0; i < 97; i++)
 	{
 		hashTable[i] = NULL;
@@ -72,8 +121,10 @@ int hashSearch::get_hash(string key_code)
 	hashValue = ascii_sum % 97;
 	return hashValue;//判断是否0-97
 }
-void hashSearch::hash_search(string key)
+void hashSearch::hash_search(string key, QTextEdit*& show)
 {
+	ostringstream oss;
+	oss << "输入的股票代码是：" << key << endl;
 	bool find = false;
 	int hash_cur = get_hash(key);
 	if (hashTable[hash_cur] == NULL)
@@ -81,12 +132,12 @@ void hashSearch::hash_search(string key)
 	else if (hashTable[hash_cur]->key_code == key)
 	{
 		find = true;
-		cout << hashTable[hash_cur]->info_stock.stockName << ' ';
-		cout << hashTable[hash_cur]->info_stock.stockCode << ' ';
-		cout << hashTable[hash_cur]->info_stock.firstCatg << ' ';
-		cout << hashTable[hash_cur]->info_stock.secondCatg << ' ';
-		cout << hashTable[hash_cur]->info_stock.bussiness << ' ';
-		cout << suc_ASL << endl;
+		oss << hashTable[hash_cur]->info_stock.stockName << ' ';
+		oss << hashTable[hash_cur]->info_stock.stockCode << ' ';
+		oss << hashTable[hash_cur]->info_stock.firstCatg << ' ';
+		oss << hashTable[hash_cur]->info_stock.secondCatg << ' ';
+		oss << hashTable[hash_cur]->info_stock.bussiness << ' ';
+		oss << suc_ASL << endl;
 	}
 	else
 	{
@@ -94,20 +145,21 @@ void hashSearch::hash_search(string key)
 		while (t)
 		{
 			t = t->next;
-			if (t&&t->key_code == key)
+			if (t && t->key_code == key)
 			{
 				find = true;
-				cout << t->info_stock.stockName << ' ';
-				cout << t->info_stock.stockCode << ' ';
-				cout << t->info_stock.firstCatg << ' ';
-				cout << t->info_stock.secondCatg << ' ';
-				cout << t->info_stock.bussiness << ' ';
-				cout << suc_ASL << endl;
+				oss << t->info_stock.stockName << ' ';
+				oss << t->info_stock.stockCode << ' ';
+				oss << t->info_stock.firstCatg << ' ';
+				oss << t->info_stock.secondCatg << ' ';
+				oss << t->info_stock.bussiness << ' ';
+				oss << suc_ASL << endl;
 			}
 		}
 	}
 	if (!find)
-		cout << "fail!" << endl;
+		oss << "fail!" << endl;
+	show->append(QString::fromLocal8Bit(oss.str().c_str()));
 }
 
 void LinkList::get_next_val(string key)
@@ -128,8 +180,10 @@ void LinkList::get_next_val(string key)
 		else j = kmp_next[j];
 	}
 }
-void LinkList::KMP_search(string key)
+void LinkList::KMP_search(string key, QTextEdit*& show)
 {
+	ostringstream oss;
+	oss << "输入的网址字符串的子串是：" << key << endl;
 	LNode* p = head->next;
 	this->get_next_val(key);
 	int keylen = key.length();
@@ -149,13 +203,14 @@ void LinkList::KMP_search(string key)
 		}
 		if (j >= keylen)
 		{
-			cout << p->key_stock.stockName << ' ' << p->key_stock.stockCode << endl;
+			oss << p->key_stock.stockName << ' ' << p->key_stock.stockCode << endl;
 			find = true;
-			//break;
 		}
 		p = p->next;
 	}
-	if (!find)cout << "fail!" << endl;
+	if (!find)
+		oss << "fail!" << endl;
+	show->append(QString::fromLocal8Bit(oss.str().c_str()));
 }
 
 void insertBST(BSNode*& bst, stock s)
@@ -182,31 +237,36 @@ BSNode* searchBST(BSNode* bst, string key)
 		return searchBST(bst->lchild, key);
 	else return searchBST(bst->rchild, key);
 }
-BSTree::BSTree(LinkList& data)
+BSTree::BSTree(LinkList*& data)
 {
 	bsTree = NULL;
-	LNode* p = data.get_head_ptr()->next;
+	LNode* p = data->get_head_ptr()->next;
 	while (p)
 	{
 		insertBST(bsTree, p->key_stock);
 		p = p->next;
 	}
 }
-void BSTree::BSsearch(string key)
+void BSTree::BSsearch(string key,QTextEdit*& show)
 {
+	ostringstream oss;
+	oss << "输入的股票代码是：" << key << endl;
 	BSNode* result = searchBST(bsTree, key);
 	if (result == NULL)
-		cout << "fail!" << endl;
+		oss << "fail!" << endl;
 	else
 	{
-		cout << result->info_stock.getLog_ptr()->next->openPrice << ' ';
-		cout << result->info_stock.getLog_ptr()->next->closePrice << ' ';
-		cout << result->info_stock.getLog_ptr()->next->quotePerChange << '%';
-		cout << endl;
+		oss << setw(20) << setiosflags(ios::right) << result->info_stock.getLog_ptr()->next->openPrice << ' ';
+		oss << setw(20) << setiosflags(ios::right) << result->info_stock.getLog_ptr()->next->closePrice << ' ';
+		oss << setw(20) << setiosflags(ios::right) << result->info_stock.getLog_ptr()->next->quotePerChange << '%';
+		oss << endl;
 	}
+	show->append(QString::fromLocal8Bit(oss.str().c_str()));
 }
-void BSTree::deleteBST(string key_code)
+void BSTree::deleteBST(string key_code,QTextEdit*& show)
 {
+	ostringstream oss;
+	oss << "输入的股票代码是：" << key_code << endl;
 	BSNode* p = bsTree, * f = NULL;
 	while (p)
 	{
@@ -219,7 +279,8 @@ void BSTree::deleteBST(string key_code)
 	}
 	if (!p)
 	{
-		cout << "没有该股票信息！" << endl;
+		oss << "没有该股票信息！" << endl;
+		show->append(QString::fromLocal8Bit(oss.str().c_str()));
 		return;
 	}
 	BSNode* q = p;
@@ -237,8 +298,9 @@ void BSTree::deleteBST(string key_code)
 			q->rchild = s->lchild;
 		else q->lchild = s->lchild;
 		delete s;
-		cout << p->key_code << ' ';
-		cout << p->lchild->key_code << ' ' << p->rchild->key_code << endl;
+		oss << p->key_code << ' ';
+		oss << p->lchild->key_code << ' ' << p->rchild->key_code << endl;
+		show->append(QString::fromLocal8Bit(oss.str().c_str()));
 		return;
 	}
 	else if (!p->rchild)
@@ -253,43 +315,52 @@ void BSTree::deleteBST(string key_code)
 	delete q;
 	if (p)
 	{
-		cout << p->key_code << ' ';
+		oss << p->key_code << ' ';
 		if (p->lchild)
-			cout << p->lchild->key_code << ' ';
-		else cout << "新节点左子树为空！" << ' ';
-		if (p->rchild) 
-			cout << p->rchild->key_code << endl;
-		else cout << "新节点右子树为空！" << endl;
+			oss << p->lchild->key_code << ' ';
+		else oss << "新节点左子树为空！" << ' ';
+		if (p->rchild)
+			oss << p->rchild->key_code << endl;
+		else oss << "新节点右子树为空！" << endl;
 	}
-	else cout << "该节点为叶子节点" << endl;
+	else
+		oss << "该节点为叶子节点" << endl;
+	show->append(QString::fromLocal8Bit(oss.str().c_str()));
 }
 
-void LinkList::search_price_by_date(string date)
+void LinkList::search_price_by_date(string date,QTextEdit*& show)
 {
+	ostringstream oss;
+	oss << "输入的日期是：" << date << endl;
 	LNode* p = head->next;
 	while (p)
 	{
 		bool find = false;
 		priceList t = p->key_stock.getLog_ptr()->next;
-		cout << p->key_stock.stockCode << ' ' << p->key_stock.stockName << ' ';
+		oss << p->key_stock.stockCode << ' ' << p->key_stock.stockName << ' ';
 		while (t)
 		{
 			if (t->tradeDate == date)
 			{
 				find = true;
-				cout << t->openPrice << ' ' << t->closePrice << ' ' << t->quotePerChange;
-				cout << endl;
+				oss << setw(20) << setiosflags(ios::right) << t->openPrice << ' ';
+				oss << setw(20) << setiosflags(ios::right) << t->closePrice << ' ';
+				oss << setw(20) << setiosflags(ios::right) << t->quotePerChange << '%';
+				oss << endl;
 			}
 			t = t->next;
 		}
 		if (!find)
-			cout << "没有当日信息!" << endl;
+			oss << "没有当日信息!" << endl;
 		p = p->next;
 	}
+	show->append(QString::fromLocal8Bit(oss.str().c_str()));
 }
 
-void LinkList::creatPricelist(string date)
+void LinkList::creatPricelist(string date, QTextEdit*& show)
 {
+	ostringstream oss;
+	oss << "输入的日期是：" << date << endl;
 	LNode* p = head->next;
 	price_sort = new priceNode;
 	price_sort->next = NULL;
@@ -315,12 +386,16 @@ void LinkList::creatPricelist(string date)
 			t->next = temp;
 			t = t->next;
 		}
-		else cout << p->key_stock.getCode() << ' ' << p->key_stock.getName() << ' ' << "无当日数据！" << endl;
+		else
+			oss << p->key_stock.getCode() << ' ' << p->key_stock.getName() << ' ' << "无当日数据！" << endl;
 		p = p->next;
 	}
+	show->append(QString::fromLocal8Bit(oss.str().c_str()));
 }
-void LinkList::insertSort(string sortmode)
+void LinkList::insertSort(int sortmode, QTextEdit*& show)
 {
+	ostringstream oss;
+	oss << "当前排序模式为：" << sortmode << endl;
 	if (price_sort->next == NULL)return;
 	priceList unnext;
 	priceList unsorted = price_sort->next->next;
@@ -329,17 +404,17 @@ void LinkList::insertSort(string sortmode)
 	{
 		unnext = unsorted->next;
 		priceList sorted = price_sort;
-		if (sortmode == "open")
+		if (sortmode == 0)
 		{
 			while (sorted->next && sorted->next->openPrice > unsorted->openPrice)
 				sorted = sorted->next;
 		}
-		else if (sortmode == "close")
+		else if (sortmode == 1)
 		{
 			while (sorted->next && sorted->next->closePrice > unsorted->closePrice)
 				sorted = sorted->next;
-		}	
-		else if (sortmode == "rate")
+		}
+		else if (sortmode == 2)
 		{
 			while (sorted->next && sorted->next->quotePerChange > unsorted->quotePerChange)
 				sorted = sorted->next;
@@ -351,9 +426,15 @@ void LinkList::insertSort(string sortmode)
 	priceList p = price_sort->next;
 	while (p)
 	{
-		cout << p->code << ' ' << p->name << ' ' << p->openPrice << ' ' << p->closePrice << ' ' << p->quotePerChange << endl;
+		oss << p->code << ' ' << p->name << ' ';
+		oss << setw(20) << setiosflags(ios::right) << p->openPrice << ' ';
+		oss << setw(20) << setiosflags(ios::right) << p->closePrice << ' ';
+		oss << setw(20) << setiosflags(ios::right) << p->quotePerChange << '%' << endl;
 		p = p->next;
 	}
+	fileIO* writef = new fileIO("./data/价格和涨跌幅排序结果.xlsx", "write", sortmode);
+
+	show->append(QString::fromLocal8Bit(oss.str().c_str()));
 }
 
 sixtyList::sixtyList()
@@ -376,12 +457,12 @@ sixtyList::~sixtyList()
 		delete t;
 	}
 }
-void sixtyList::creatQSList(LinkList& data, string inputs, string catg)
+void sixtyList::creatQSList(LinkList*& data, string inputs, string catg)
 {
-	LNode* p = data.get_head_ptr()->next;
+	LNode* p = data->get_head_ptr()->next;
 	istringstream ss(inputs);
 	string temp, code;
-	int score;
+	double score;
 	ss >> temp >> temp >> code >> score;
 	while (p)
 	{
@@ -440,28 +521,31 @@ int sixtyList::partition(int low, int high)
 	QStable[low] = t;
 	return low;
 }
-void sixtyList::showQS()
+void sixtyList::showQS(QTextEdit*& show)
 {
+	ostringstream oss;
 	if (length == 0)
-		cout << "无该行业数据！" << endl;
+		oss << "无该行业数据！" << endl;
 	for (int i = 0; i < length; i++)
 	{
-		cout << i << ' ' << QStable[i].code << ' ' << QStable[i].name << ' ';
-		cout << QStable[i].rate << ' ' << QStable[i].date << endl;
+		oss << setw(4) << i + 1 << ' ' << QStable[i].code << ' ' << QStable[i].name << ' ';
+		oss << setw(8) << QStable[i].rate << "% " << QStable[i].date << endl;
 	}
+	show->append(QString::fromLocal8Bit(oss.str().c_str()));
 }
 
-void sixtyList::creatESList(LinkList& data, string inputs)
+void sixtyList::creatESList(LinkList*& data, string inputs)
 {
 	sixtyNode* work_ptr = EShead;
 	while (work_ptr->next)
 	{
 		work_ptr = work_ptr->next;
 	}
-	LNode* p = data.get_head_ptr()->next;
+	LNode* p = data->get_head_ptr()->next;
 	istringstream ss(inputs);
 	string temp, code;
-	int index,score;
+	int index;
+	double score;
 	ss >> index >> temp >> code >> score;
 	while (p)
 	{
@@ -481,14 +565,15 @@ void sixtyList::creatESList(LinkList& data, string inputs)
 		p = p->next;
 	}
 }
-void sixtyList::easySort(string sortmode)
+void sixtyList::easySort(string sortmode, QTextEdit*& show)
 {
 	sixtyNode* unsorted = EShead;
 	sixtyNode* sorted = new sixtyNode;
+	sorted->next = NULL;
 	while (unsorted->next)
 	{
 		sixtyNode* tempun = unsorted->next;
-		int max_score = -1;
+		double max_score = -1;
 		double max_close = -1;
 		while (tempun)
 		{
@@ -499,7 +584,6 @@ void sixtyList::easySort(string sortmode)
 			tempun = tempun->next;
 		}
 		tempun = unsorted;
-		//cout << max_score << endl;
 		while (tempun->next)
 		{
 			if (tempun->next->score == max_score || tempun->next->close == max_close)
@@ -517,17 +601,21 @@ void sixtyList::easySort(string sortmode)
 		temps->next = found;
 	}
 	EShead = sorted;
+	showES(show);
 }
-void sixtyList::showES()
+void sixtyList::showES(QTextEdit*& show)
 {
+	ostringstream oss;
 	sixtyNode* p = EShead->next;
 	int pos = 1;
 	while (p)
 	{
-		cout << p->index << ' ' << p->code << ' ' << p->name << ' ' << p->score << ' ' << p->close << endl;
+		oss << p->index << ' ' << p->code << ' ' << p->name << ' ' << setw(15) << p->score << ' ';
+		oss << setw(15) << p->close << endl;
 		pos++;
 		p = p->next;
 	}
+	show->append(QString::fromLocal8Bit(oss.str().c_str()));
 }
 string sixtyList::getNameByIndex(int index)
 {
@@ -552,13 +640,14 @@ AMGraph::AMGraph()
 		}
 	}
 }
-void AMGraph::creatUDNv(sixtyList &lst)
+void AMGraph::creatUDNv(sixtyList*& lst)
 {
-	sixtyNode* p = lst.EShead->next;
+	sixtyNode* p = lst->EShead->next;
 	while (p)
 	{
 		vexs[vexnum].index = p->index;
 		vexs[vexnum].name = p->name;
+		vexs[vexnum].code = p->code;
 		vexnum++;
 		p = p->next;
 	}
@@ -601,8 +690,11 @@ void AMGraph::floyd()
 		}
 	}
 }
-void AMGraph::getMinLen(string index1, string index2, string& min_len, string& rst)
+void AMGraph::getMinLen(string index1, string index2, QTextEdit*& show)
 {
+	ostringstream oss;
+	oss << "输入的节点为：" << index1 << ' ' << index2 << endl;
+	string min_len, rst;
 	floyd();
 	int pos1 = 61, pos2 = 61;
 	istringstream ss1(index1), ss2(index2);
@@ -611,9 +703,9 @@ void AMGraph::getMinLen(string index1, string index2, string& min_len, string& r
 		for (int i = 0; i < 60; i++)
 		{
 			if (vexs[i].name == index1 || vexs[i].code == index1)
-				pos1 = i;
+				pos1 = i + 1;
 			else if (vexs[i].name == index2 || vexs[i].code == index2)
-				pos2 = i;
+				pos2 = i + 1;
 		}
 	}
 	pos1--;
@@ -647,10 +739,13 @@ void AMGraph::getMinLen(string index1, string index2, string& min_len, string& r
 		rst += to_string(pos2 + 1) + ' ';
 		rst += to_string(pos1 + 1) + ' ';
 	}
-	reverse(rst.begin(), rst.end());
+	//if (rst != "无路径")
+	//	reverse(rst.begin(), rst.end());
+	oss << min_len << ": " << rst << endl;
+	show->append(QString::fromLocal8Bit(oss.str().c_str()));
 }
 
-void AMGraph::prime(sixtyList& lst,int pos)
+void AMGraph::prime(sixtyList*& lst,QTextEdit*& show, int pos)
 {
 	floyd();
 	int initw = 32767, posnow;
@@ -691,11 +786,11 @@ void AMGraph::prime(sixtyList& lst,int pos)
 		tedges[i - 1].w = minw;
 		tedges[i - 1].pos1 = closedge[posnext].adjvex + 1;
 		tedges[i - 1].pos2 = posnext + 1;
-		tedges[i - 1].name1 = lst.getNameByIndex(tedges[i - 1].pos1);
-		tedges[i - 1].name2 = lst.getNameByIndex(tedges[i - 1].pos2);
+		tedges[i - 1].name1 = lst->getNameByIndex(tedges[i - 1].pos1);
+		tedges[i - 1].name2 = lst->getNameByIndex(tedges[i - 1].pos2);
 		tedges[i - 1].totalscore = 0;
 		bool find1 = false, find2 = false;
-		sixtyNode* p = lst.EShead->next;
+		sixtyNode* p = lst->EShead->next;
 		while (p)
 		{
 			if (p->index == (tedges[i - 1].pos1))
@@ -789,14 +884,16 @@ void AMGraph::prime(sixtyList& lst,int pos)
 			tedges[t].totalscore = temp6;
 		}
 	}
+	ostringstream oss;
 	for (int i = 0; i < 6; i++)
 	{
-		cout << tedges[i].w << ' ' << tedges[i].pos1 << ": " << tedges[i].name1 << ' ';
-		cout << tedges[i].pos2 << ": " << tedges[i].name2 << ' ' << tedges[i].totalscore << endl;
+		oss << setw(8) << tedges[i].w << ' ' << tedges[i].pos1 << ": " << tedges[i].name1 << ' ';
+		oss << setw(8) << tedges[i].pos2 << ": " << tedges[i].name2 << ' ' << tedges[i].totalscore << endl;
 	}
+	show->append(QString::fromLocal8Bit(oss.str().c_str()));
 }
 
-void AMGraph::kruskal(sixtyList& lst)
+void AMGraph::kruskal(sixtyList*& lst,QTextEdit*& show)
 {
 	floyd();
 	for (int i = 0; i < vexnum; i++)
@@ -809,7 +906,7 @@ void AMGraph::kruskal(sixtyList& lst)
 			edge[pos].tail = j;
 			edge[pos].lowcost = d[i][j];
 			edge[pos].totalscore = 0;
-			sixtyNode* p = lst.EShead->next;
+			sixtyNode* p = lst->EShead->next;
 			while (p)
 			{
 				if (p->index == (j + 1))
@@ -817,7 +914,7 @@ void AMGraph::kruskal(sixtyList& lst)
 					edge[pos].totalscore += p->score;
 					find1 = true;
 				}
-				if(p->index == (i + 1))
+				if (p->index == (i + 1))
 				{
 					edge[pos].totalscore += p->score;
 					find1 = true;
@@ -859,7 +956,7 @@ void AMGraph::kruskal(sixtyList& lst)
 		int temp1, temp2, temp3, temp4;
 		for (int j = i + 1; j < 3600; j++)
 		{
-			if (edge[j].lowcost == edge[t].lowcost && 
+			if (edge[j].lowcost == edge[t].lowcost &&
 				edge[j].totalscore > edge[t].totalscore)
 				t = j;
 		}
@@ -880,16 +977,17 @@ void AMGraph::kruskal(sixtyList& lst)
 		}
 	}
 	int count = 0;
+	ostringstream oss;
 	for (int i = 0; i < 3600; i++)
 	{
 		if (vexset[edge[i].head] != vexset[edge[i].tail])
 		{
 			if (count++ < 6)
 			{
-				cout << edge[i].lowcost << ' ';
-				cout << edge[i].head + 1 << ": " << lst.getNameByIndex(edge[i].head + 1) << ' ';
-				cout << edge[i].tail + 1 << ": " << lst.getNameByIndex(edge[i].tail + 1) << ' ';
-				cout << edge[i].totalscore << endl;
+				oss << setw(8) << edge[i].lowcost << ' ';
+				oss << setw(8) << edge[i].head + 1 << ": " << lst->getNameByIndex(edge[i].head + 1) << ' ';
+				oss << setw(8) << edge[i].tail + 1 << ": " << lst->getNameByIndex(edge[i].tail + 1) << ' ';
+				oss << setw(8) << edge[i].totalscore << endl;
 			}
 			for (int j = 0; j < 60; j++)
 			{
@@ -898,10 +996,12 @@ void AMGraph::kruskal(sixtyList& lst)
 			}
 		}
 	}
+	show->append(QString::fromLocal8Bit(oss.str().c_str()));
 }
 
-void AMGraph::bip(sixtyList& lst, int* inputs)
+void AMGraph::bip(sixtyList*& lst, int* inputs,QTextEdit*& show)
 {
+	ostringstream oss;
 	int points_ind[10];
 	int sides[10][10];
 	int color[10];
@@ -923,10 +1023,8 @@ void AMGraph::bip(sixtyList& lst, int* inputs)
 	for (int i = 0; i < 10; i++)
 	{
 		for (int j = 0; j < 10; j++)
-		{
-			cout << setw(8) << sides[i][j];
-		}
-		cout << endl;
+			oss << setw(8) << sides[i][j];
+		oss << endl;
 	}
 	color[0] = 1;
 	stack[top++] = points_ind[0];
@@ -937,7 +1035,7 @@ void AMGraph::bip(sixtyList& lst, int* inputs)
 		{
 			if (sides[top_p][i] < 32767 && color[i] == -1)
 			{
-				color[i] = !color[top_p];
+				color[i] = ~color[top_p];
 				stack[top++] = i;
 			}
 			else if (sides[top_p][i] < 32767 && color[top_p] == color[i])
@@ -948,9 +1046,11 @@ void AMGraph::bip(sixtyList& lst, int* inputs)
 	{
 		for (int i = 0; i < 10; i++)
 		{
-			cout << points_ind[i] << ' ';
-			cout << lst.getNameByIndex(points_ind[i] + 1) << endl;
+			oss << setw(4) << points_ind[i] + 1 << ' ';
+			oss << lst->getNameByIndex(points_ind[i] + 1) << endl;
 		}
 	}
-	else cout << "不能构成二部图！" << endl;
+	else
+		oss << "不能构成二部图！" << endl;
+	show->append(QString::fromLocal8Bit(oss.str().c_str()));
 }

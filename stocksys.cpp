@@ -36,24 +36,10 @@ void initsys(LinkList& data_LinkList, sixtyList& sixtydata_List, AMGraph& graph,
 		graph_file.readline(i);
 		graph.creatUDNa(graph_file.get_cont_str());
 	}
-	/*LNode* temp = data_LinkList.get_head_ptr()->next;
-	while (temp)
-	{
-		cout << temp->key_stock.getCode() << endl << "½»Ò×¼ÇÂ¼£º" << endl;
-		priceList temp1 = temp->key_stock.getLog_ptr()->next;
-		while (temp1)
-		{
-			cout << temp1->tradeDate << ' ' << temp1->openPrice << ' ';
-			cout << temp1->closePrice << ' ' << temp1->quotePerChange << endl;
-			temp1 = temp1->next;
-		}
-		temp = temp->next;
-	}*/
 }
 
 int main()
 {
-	
 	LinkList data_LinkList;
 	sixtyList sixtydata_List;
 	AMGraph graph;

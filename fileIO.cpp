@@ -22,26 +22,12 @@ fileIO::fileIO(string path, int sheetnum)
 	}
 }
 
-fileIO::fileIO(string path, string writeflag, string savepath)
+fileIO::fileIO(string path, string writeflag, int sheetnum)
 {
-	const char* pathc = path.data();
-	const char* txtpath = "./data/股票交易日志";
-	if(path[13] == *txtpath)
-	{
-		isTxt = true;
-		txtfile.open(path);
-	}
-	else
-	{
-		book = xlCreateXMLBook();
-		book->setKey("TommoT", "windows-2421220b07c2e10a6eb96768a2p7r6gc");
-		if (book->load(pathc))
-		{
-			sheetread = book->getSheet(0);
-			//if (savepath == "0")*path_to_save = *pathc;
-			//else *path_to_save = *savepath;
-		}
-	}
+	book = xlCreateXMLBook();
+	book->setKey("TommoT", "windows-2421220b07c2e10a6eb96768a2p7r6gc");
+	sheetwrite = book->addSheet(to_string(sheetnum).c_str());
+	path_to_save = path;
 }
 
 fileIO::~fileIO()
