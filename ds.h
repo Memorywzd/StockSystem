@@ -54,11 +54,10 @@ public:
 	hashSearch(LinkList*&);
 	int get_hash(string);
 	void hash_search(string, QTextEdit*&);
+	void getASL();
 private:
 	hashNode* hashTable[97];
-	double factor = 200.0 / 97;//wrong
-	double suc_ASL = 1 + factor / 2;
-	double fail_ASL = factor + exp(-factor);
+	double suc_ASL;
 };
 
 class BSNode
@@ -74,9 +73,11 @@ public:
 	BSTree(LinkList*&);
 	void BSsearch(string, QTextEdit*&);
 	void deleteBST(string, QTextEdit*&);
+	void insertBST(BSNode*&, stock);
 private:
 	BSNode* bsTree;
-	//ASL
+	int snum;
+	double suc_ASL;
 };
 
 class sixtyNode

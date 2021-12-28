@@ -37,7 +37,7 @@
       <x>0</x>
       <y>0</y>
       <width>1061</width>
-      <height>605</height>
+      <height>575</height>
      </rect>
     </property>
     <attribute name="label">
@@ -112,8 +112,8 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>1061</width>
-      <height>605</height>
+      <width>98</width>
+      <height>28</height>
      </rect>
     </property>
     <attribute name="label">
@@ -169,8 +169,8 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>1061</width>
-      <height>605</height>
+      <width>98</width>
+      <height>28</height>
      </rect>
     </property>
     <attribute name="label">
@@ -233,8 +233,8 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>1061</width>
-      <height>605</height>
+      <width>98</width>
+      <height>28</height>
      </rect>
     </property>
     <attribute name="label">
@@ -902,9 +902,9 @@
     <widget class="QLabel" name="label_4">
      <property name="geometry">
       <rect>
-       <x>120</x>
+       <x>50</x>
        <y>10</y>
-       <width>211</width>
+       <width>271</width>
        <height>21</height>
       </rect>
      </property>
@@ -919,7 +919,7 @@
       <x>0</x>
       <y>0</y>
       <width>1061</width>
-      <height>605</height>
+      <height>575</height>
      </rect>
     </property>
     <attribute name="label">
@@ -979,9 +979,9 @@
     <widget class="QLabel" name="label_2">
      <property name="geometry">
       <rect>
-       <x>40</x>
+       <x>50</x>
        <y>10</y>
-       <width>211</width>
+       <width>271</width>
        <height>16</height>
       </rect>
      </property>
@@ -992,7 +992,7 @@
     <widget class="QComboBox" name="prim_comb">
      <property name="geometry">
       <rect>
-       <x>260</x>
+       <x>320</x>
        <y>10</y>
        <width>187</width>
        <height>23</height>
@@ -1310,8 +1310,8 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>1061</width>
-      <height>605</height>
+      <width>98</width>
+      <height>28</height>
      </rect>
     </property>
     <attribute name="label">

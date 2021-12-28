@@ -109,6 +109,7 @@ hashSearch::hashSearch(LinkList*& intro)
 		}
 		introPtr = introPtr->next;
 	}
+	getASL();
 }
 int hashSearch::get_hash(string key_code)
 {
@@ -160,6 +161,22 @@ void hashSearch::hash_search(string key, QTextEdit*& show)
 	if (!find)
 		oss << "fail!" << endl;
 	show->append(QString::fromLocal8Bit(oss.str().c_str()));
+}
+void hashSearch::getASL()
+{
+	int findnum = 0;
+	for (int i = 0; i < 97; i++)
+	{
+		int depth = 1;
+		hashNode* p = hashTable[i];
+		while (p)
+		{
+			findnum += depth;
+			depth++;
+			p = p->next;
+		}
+	}
+	suc_ASL = findnum / 200.0;
 }
 
 void LinkList::get_next_val(string key)
@@ -213,7 +230,7 @@ void LinkList::KMP_search(string key, QTextEdit*& show)
 	show->append(QString::fromLocal8Bit(oss.str().c_str()));
 }
 
-void insertBST(BSNode*& bst, stock s)
+void BSTree::insertBST(BSNode*& bst, stock s)
 {
 	if (!bst)
 	{
@@ -222,11 +239,18 @@ void insertBST(BSNode*& bst, stock s)
 		t->info_stock = s;
 		t->lchild = t->rchild = NULL;
 		bst = t;
+		snum++;
 	}
 	else if (s.getCode() < bst->key_code)
+	{
+		snum++;
 		insertBST(bst->lchild, s);
+	}
 	else if (s.getCode() > bst->key_code)
+	{
+		snum++;
 		insertBST(bst->rchild, s);
+	}
 	else cout << "insertBST: erro!" << endl;
 }
 BSNode* searchBST(BSNode* bst, string key)
@@ -240,12 +264,14 @@ BSNode* searchBST(BSNode* bst, string key)
 BSTree::BSTree(LinkList*& data)
 {
 	bsTree = NULL;
+	snum = 0;
 	LNode* p = data->get_head_ptr()->next;
 	while (p)
 	{
 		insertBST(bsTree, p->key_stock);
 		p = p->next;
 	}
+	suc_ASL = snum / 200.0;
 }
 void BSTree::BSsearch(string key,QTextEdit*& show)
 {
@@ -259,6 +285,7 @@ void BSTree::BSsearch(string key,QTextEdit*& show)
 		oss << setw(20) << setiosflags(ios::right) << result->info_stock.getLog_ptr()->next->openPrice << ' ';
 		oss << setw(20) << setiosflags(ios::right) << result->info_stock.getLog_ptr()->next->closePrice << ' ';
 		oss << setw(20) << setiosflags(ios::right) << result->info_stock.getLog_ptr()->next->quotePerChange << '%';
+		oss << setw(20) << setiosflags(ios::right) << suc_ASL;
 		oss << endl;
 	}
 	show->append(QString::fromLocal8Bit(oss.str().c_str()));
@@ -424,7 +451,8 @@ void LinkList::insertSort(int sortmode, QTextEdit*& show)
 		unsorted = unnext;
 	}
 	priceList p = price_sort->next;
-	fileIO* writef = new fileIO("./data/价格和涨跌幅排序结果.xlsx", "write", sortmode);
+	string path = "./data/价格和涨跌幅排序结果" + to_string(sortmode) + ".xlsx";
+	fileIO* writef = new fileIO(path, "write", sortmode);
 	string title("股票代码 股票名称 开盘价 收盘价 涨跌幅 " + p->tradeDate);
 	writef->write(title, 6, 0);
 	while (p)
@@ -706,7 +734,8 @@ void AMGraph::getMinLen(string index1, string index2, QTextEdit*& show)
 {
 	ostringstream oss;
 	oss << "输入的节点为：" << index1 << ' ' << index2 << endl;
-	string min_len, rst;
+	string min_len, rst[60];
+	int pointsnum = 0;
 	floyd();
 	int pos1 = 61, pos2 = 61;
 	istringstream ss1(index1), ss2(index2);
@@ -728,32 +757,35 @@ void AMGraph::getMinLen(string index1, string index2, QTextEdit*& show)
 	if (legpos)
 	{
 		min_len += "输入的点不存在";
-		rst += "无路径";
+		rst[pointsnum] = "无路径";
 	}
 	else if (pos1 == pos2)
 	{
 		min_len += "0";
-		rst += to_string(pos1 + 1) + ' ' + to_string(pos1 + 1);
+		rst[pointsnum] = to_string(pos1 + 1) + ' ' + to_string(pos1 + 1);
 	}
 	else if (d[pos1][pos2] == 32767)
 	{
 		min_len += "两点不连通";
-		rst += "无路径";
+		rst[pointsnum] = "无路径";
 	}
 	else
 	{
 		min_len = to_string(d[pos1][pos2]);
 		while (path[pos1][pos2] != pos1)
 		{
-			rst += to_string(pos2 + 1) + ' ';
+			rst[pointsnum++] = to_string(pos2 + 1);
 			pos2 = path[pos1][pos2];
 		}
-		rst += to_string(pos2 + 1) + ' ';
-		rst += to_string(pos1 + 1) + ' ';
+		rst[pointsnum++] = to_string(pos2 + 1);
+		rst[pointsnum++] = to_string(pos1 + 1);
 	}
-	//if (rst != "无路径")
-	//	reverse(rst.begin(), rst.end());
-	oss << min_len << ": " << rst << endl;
+	oss << min_len << ": " ;
+	for (int i = pointsnum - 1; i >= 0; i--)
+	{
+		oss << rst[i] << ' ';
+	}
+	oss << endl;
 	show->append(QString::fromLocal8Bit(oss.str().c_str()));
 }
 
@@ -897,10 +929,29 @@ void AMGraph::prime(sixtyList*& lst,QTextEdit*& show, int pos)
 		}
 	}
 	ostringstream oss;
+	int poss[6];
 	for (int i = 0; i < 6; i++)
 	{
+		poss[i] = -1;
+	}
+	int pointsnum = 0;
+	bool dif1 = true, dif2 = true;
+	for (int i = 0; i < 100; i++)
+	{
+		for (int j = 0; j < 6; j++)
+		{
+			if (poss[j] == tedges[i].pos1)
+				dif1 = false;
+			if (poss[j] == tedges[i].pos2)
+				dif2 = false;
+		}
+		if (dif1)
+			poss[pointsnum++] = tedges[i].pos1;
+		if (dif2)
+			poss[pointsnum++] = tedges[i].pos2;
 		oss << setw(8) << tedges[i].w << ' ' << tedges[i].pos1 << ": " << tedges[i].name1 << ' ';
 		oss << setw(8) << tedges[i].pos2 << ": " << tedges[i].name2 << ' ' << tedges[i].totalscore << endl;
+		if (pointsnum == 6)break;
 	}
 	show->append(QString::fromLocal8Bit(oss.str().c_str()));
 }
@@ -988,19 +1039,35 @@ void AMGraph::kruskal(sixtyList*& lst,QTextEdit*& show)
 			edge[t].totalscore = temp4;
 		}
 	}
-	int count = 0;
 	ostringstream oss;
+	int poss[6];
+	for (int i = 0; i < 6; i++)
+	{
+		poss[i] = -1;
+	}
+	int pointsnum = 0;
+	bool dif1 = true, dif2 = true;
 	for (int i = 0; i < 3600; i++)
 	{
 		if (vexset[edge[i].head] != vexset[edge[i].tail])
 		{
-			if (count++ < 6)
+			for (int j = 0; j < 6; j++)
 			{
-				oss << setw(8) << edge[i].lowcost << ' ';
-				oss << setw(8) << edge[i].head + 1 << ": " << lst->getNameByIndex(edge[i].head + 1) << ' ';
-				oss << setw(8) << edge[i].tail + 1 << ": " << lst->getNameByIndex(edge[i].tail + 1) << ' ';
-				oss << setw(8) << edge[i].totalscore << endl;
+				if (poss[j] == edge[i].head)
+					dif1 = false;
+				if (poss[j] == edge[i].tail)
+					dif2 = false;
 			}
+			if (dif1)
+				poss[pointsnum++] = edge[i].head;
+			if (dif2)
+				poss[pointsnum++] = edge[i].tail;
+			oss << setw(8) << edge[i].lowcost << ' ';
+			oss << setw(8) << edge[i].head + 1 << ": " << lst->getNameByIndex(edge[i].head + 1) << ' ';
+			oss << setw(8) << edge[i].tail + 1 << ": " << lst->getNameByIndex(edge[i].tail + 1) << ' ';
+			oss << setw(8) << edge[i].totalscore << endl;
+			if (pointsnum == 6)
+				break;
 			for (int j = 0; j < 60; j++)
 			{
 				if (vexset[j] == vexset[edge[i].tail])
